@@ -5,7 +5,7 @@
 
 class ThreadSafeQueue {
 private:
-    std::queue<Event> queue_;
+    std::queue<std::string> queue_;
     mutable std::mutex mutex_;
     std::condition_variable condition_;
 
@@ -15,7 +15,7 @@ public:
 
     void enqueue(Event item) ;
 
-    Event dequeue();
+    std::string dequeue();
 
     bool empty() const ;
     size_t size() const ;
