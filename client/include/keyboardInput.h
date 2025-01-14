@@ -9,10 +9,13 @@
 class keyboardInput
 {
 private:
+    ThreadSafeQueue &eventsFromUser;
+    std::string userName;
 
 public:
-    keyboardInput();
+    keyboardInput(ThreadSafeQueue &q);
     virtual ~keyboardInput();
     void run(ThreadSafeQueue &t);
-    std::string &CreateEvent(const std::string& e);
+    void sendFrame(const std::string& frame);
+    void createEvent(const std::string& e);
 };
