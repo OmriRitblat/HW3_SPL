@@ -21,10 +21,10 @@ public:
         condition_.notify_one();
     }
 
-    Event dequeue() {
+    std::string dequeue() {
         std::unique_lock<std::mutex> lock(mutex_);
         condition_.wait(lock, [this]() { return !queue_.empty(); }); // Wait until queue is not empty
-        Event item = std::move(queue_.front());
+        std::string item = std::move(queue_.front());
         queue_.pop();
         return item;
     }

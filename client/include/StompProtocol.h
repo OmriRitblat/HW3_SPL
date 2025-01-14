@@ -6,5 +6,9 @@
 class StompProtocol
 {
 private:
+bool terminate;
 public:
+    StompProtocol();
+    std::string process(std::string msg); 
+    bool shouldTerminate();
 };
