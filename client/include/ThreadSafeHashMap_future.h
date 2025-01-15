@@ -3,18 +3,19 @@
 #include <mutex>
 #include <functional>
 #include <optional>
+#include "../include/Frame.h"
 
 class ThreadSafeHashMap_future {
 private:
-    std::unordered_map<int, bool> map;
+    std::unordered_map<int, Frame> map;
     mutable std::mutex mapMutex;
 
 public:
     // Add or update a key-value pair
-    void put(const int& key, const bool& value);
+    void put(const int& key, const Frame& value);
 
     // Retrieve a value by key
-    bool get(const int& key) const;
+    Frame get(const int& key) const;
 
     // Check if a key exists
     bool containsKey(const int& key) const;

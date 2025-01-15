@@ -24,14 +24,18 @@ int main (int argc, char *argv[]) {
         return 1;
     }
     std::unordered_map<std::string, std::list<Frame>> server_data;
-    ThreadSafeHashMap_future sendMessages;
-	StompProtocol protocol;
+    ThreadSafeHashMap_future sendMessages;//map of recip id and the frame
+	StompProtocol protocol(server_data,sendMessages);
     ThreadSafeQueue eventQueue;
 	keyboardInput inputHandler(std::ref(eventQueue));
+    int receipt=0;
     std::thread inputThread(&keyboardInput::run, &inputHandler);//run input from user thread
     while (1) {
-		std::string frame=eventQueue.dequeue();
-        if (!connectionHandler.sendLine(frame)) {
+        receipt++;
+		Frame frame=eventQueue.dequeue();
+        frame.addFiled("receipt",receipt+"");
+        sendMessages.put(receipt,frame);
+        if (!connectionHandler.sendLine(frame.toString())) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
         }

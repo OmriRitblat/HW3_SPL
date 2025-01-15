@@ -7,7 +7,7 @@
 #include <list>
 #include <unordered_map>
 
-StompProtocol::StompProtocol(std::unordered_map<std::string, std::list<Frame>> &respoonses) : terminate(false)
+StompProtocol::StompProtocol(std::unordered_map<std::string, std::list<Frame>> &respoonses,ThreadSafeHashMap_future f) : terminate(false)
 {
     // Initialization or any other setup
 }

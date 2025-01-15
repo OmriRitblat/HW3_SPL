@@ -22,5 +22,8 @@ public:
     void parseStringToHashMap(const std::string &inputString);
 
     const std::string &getValue(const std::string &key) const;
-    const ServerResponseType &Frame::getType() const;
+    const ServerResponseType &getType() const;
+    const void addFiled(std::string key, std::string value);
+    std::string& toString();
+    std::string typeToString(ServerResponseType s);
 };

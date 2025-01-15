@@ -71,3 +71,23 @@ const ServerResponseType &Frame::getType() const
 {
     return type;
 }
+    const void Frame::addFiled(std::string key, std::string value){
+        data.insert(key,value);
+    }
+    std::string& Frame::toString(){
+        std::string res=typeToString(type)+"\n";
+        for (const auto& [key, value] : data) {
+        res+=""+key+": "+""+value+"\n";
+    }
+    res+="^@";
+    return res;
+    }
+    std::string Frame::typeToString(ServerResponseType s) {
+    switch (s) {
+        case ServerResponseType::ERROR:   return "ERROR";
+        case ServerResponseType::CONNECTED:   return "CONNECTED";
+        case ServerResponseType::MESSAGE:   return "MESSAGE";
+        case ServerResponseType::RECEIPT:   return "RECEIPT";
+        default:           return "Unknown";
+    }
+}
