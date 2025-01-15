@@ -21,19 +21,17 @@ class Frame
 private:
     CommandType type;
     std::unordered_map<std::string, std::string> data;
+    int receipt;
 
 public:
     Frame(const std::string &inputString);
-
+    
     void parseStringToHashMap(const std::string &inputString);
 
     const std::string &getValue(const std::string &key) const;
-<<<<<<< HEAD
     const CommandType &Frame::getType() const;
-=======
-    const ServerResponseType &getType() const;
-    const void addFiled(std::string key, std::string value);
+    const void addReceipt(std::string key, int value);
     std::string& toString();
-    std::string typeToString(ServerResponseType s);
->>>>>>> refs/remotes/origin/main
+    std::string typeToString(CommandType s);
+    int getRecipt() const;
 };

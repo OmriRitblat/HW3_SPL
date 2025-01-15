@@ -81,8 +81,10 @@ const CommandType &Frame::getType() const
 {
     return type;
 }
-    const void Frame::addFiled(std::string key, std::string value){
-        data.insert(key,value);
+    const void Frame::addReceipt(std::string key, int value){
+        std::string val=value+"";
+        data.insert(key,val);
+        receipt=value;
     }
     std::string& Frame::toString(){
         std::string res=typeToString(type)+"\n";
@@ -92,12 +94,20 @@ const CommandType &Frame::getType() const
     res+="^@";
     return res;
     }
-    std::string Frame::typeToString(ServerResponseType s) {
+    std::string Frame::typeToString(CommandType s) {
     switch (s) {
-        case ServerResponseType::ERROR:   return "ERROR";
-        case ServerResponseType::CONNECTED:   return "CONNECTED";
-        case ServerResponseType::MESSAGE:   return "MESSAGE";
-        case ServerResponseType::RECEIPT:   return "RECEIPT";
+        case CommandType::ERROR:   return "ERROR";
+        case CommandType::CONNECTED:   return "CONNECTED";
+        case CommandType::MESSAGE:   return "MESSAGE";
+        case CommandType::RECEIPT:   return "RECEIPT";
+        case CommandType::CONNECT:   return "CONNECT";
+        case CommandType::SUBSCRIBE:   return "SUBSCRIBE";
+        case CommandType::UNSUBSCRIBE:   return "UNSUBSCRIBE";
+        case CommandType::SEND:   return "SEND";
+        case CommandType::DISCONNECT:   return "DISCONNECT";
         default:           return "Unknown";
     }
 }
+int Frame::getRecipt() const{
+        return receipt;
+    }

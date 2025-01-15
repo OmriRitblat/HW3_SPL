@@ -5,11 +5,18 @@
 #include <optional>
 #include "../include/ThreadSafeHashMap_future.h";
 
-    void ThreadSafeHashMap_future::put(const int& key, const bool& value){
+    void ThreadSafeHashMap_future::put(const int& key, const Frame& value){
     std::lock_guard<std::mutex> lock(mapMutex);
     map[key] = value;
 }
+    Frame ThreadSafeHashMap_future::get(const int& key) const {
+    std::lock_guard<std::mutex> lock(mapMutex);
 
+    auto it = map.find(key);
+    if (it != map.end()) {
+        return it->second;
+    }
+}
 
     // Check if a key exists
     bool ThreadSafeHashMap_future::containsKey(const int& key) const {
