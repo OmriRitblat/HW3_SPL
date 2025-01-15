@@ -2,9 +2,12 @@
 #include "../include/ConnectionHandler.h"
 #include "../include/keyboardInput.h"
 #include "../include/ThreadSafeQueue.h"
+#include "../include/ThreadSafeHashMap_future.h"
 #include "../include/StompProtocol.h"
+#include "../include/Frame.h"
 #include <thread>
 #include <iostream>
+#include <list>
 
 
 int main (int argc, char *argv[]) {
@@ -20,6 +23,8 @@ int main (int argc, char *argv[]) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
+    std::unordered_map<std::string, std::list<Frame>> server_data;
+    ThreadSafeHashMap_future sendMessages;
 	StompProtocol protocol;
     ThreadSafeQueue eventQueue;
 	keyboardInput inputHandler(std::ref(eventQueue));
