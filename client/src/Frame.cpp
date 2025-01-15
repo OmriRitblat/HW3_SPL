@@ -81,8 +81,10 @@ const CommandType &Frame::getType() const
 {
     return type;
 }
-    const void Frame::addFiled(std::string key, std::string value){
-        data.insert(key,value);
+    const void Frame::addReceipt(std::string key, int value){
+        std::string val=value+"";
+        data.insert(key,val);
+        receipt=value;
     }
     std::string& Frame::toString(){
         std::string res=typeToString(type)+"\n";
@@ -98,6 +100,17 @@ const CommandType &Frame::getType() const
         case CommandType::CONNECTED:   return "CONNECTED";
         case CommandType::MESSAGE:   return "MESSAGE";
         case CommandType::RECEIPT:   return "RECEIPT";
+<<<<<<< HEAD
+=======
+        case CommandType::CONNECT:   return "CONNECT";
+        case CommandType::SUBSCRIBE:   return "SUBSCRIBE";
+        case CommandType::UNSUBSCRIBE:   return "UNSUBSCRIBE";
+        case CommandType::SEND:   return "SEND";
+        case CommandType::DISCONNECT:   return "DISCONNECT";
+>>>>>>> refs/remotes/origin/main
         default:           return "Unknown";
     }
 }
+int Frame::getRecipt() const{
+        return receipt;
+    }

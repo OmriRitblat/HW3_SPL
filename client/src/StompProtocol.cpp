@@ -35,7 +35,19 @@ std::string StompProtocol::process(std::string msg)
 }
 bool StompProtocol::shouldTerminate()
 {
+    return terminate;
 }
 void StompProtocol::handelRecipt(const Frame &serverMessage)
 {
+    Frame f=recieptMap.get(serverMessage.getRecipt());
+    CLI c;
+    switch (f.getType())
+    {
+        case CommandType::SUBSCRIBE:
+            c.display("Joined channel" + f.getValue("destination"));
+        case CommandType::UNSUBSCRIBE:   
+            c.display("Exited channel" + f.getValue("destination"));
+        case CommandType::DISCONNECT:
+            terminate=true;
+    }
 }
