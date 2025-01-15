@@ -5,6 +5,7 @@
 #include "../include/event.h"
 #include "../include/keyboardInput.h"
 #include "../include/ThreadSafeQueue.h"
+#include "../include/CLI.h"
 #include <unordered_map>
 
 keyboardInput::keyboardInput(ThreadSafeQueue &q) : eventsFromUser(q), userName("") {}
@@ -23,6 +24,7 @@ void keyboardInput::run(ThreadSafeQueue &t)
 
 void keyboardInput::createEvent(const std::string &e)
 {
+    CLI c;
     std::istringstream input(e);
     std::string command, arg1, arg2, arg3, endMsg;
     input >> command;
@@ -32,11 +34,9 @@ void keyboardInput::createEvent(const std::string &e)
     {
         input >> arg1 >> arg2 >> arg3 >> endMsg; // host:port, username, password
         if (arg1 == "" || arg2 == "" || arg3 == "")
-            frame << "ERROR\n"
-                  << "one of the argument is missing, you should insert port, username, password";
+            c.display("one of the argument is missing, you should insert port, username, password");
         else if (endMsg != "")
-            frame << "ERROR\n"
-                  << "there is unnessery data, you should insert port, username, password";
+            c.display("there is unnessery data, you should insert port, username, password");
         else
         {
             frame << "CONNECT\n"
@@ -45,58 +45,51 @@ void keyboardInput::createEvent(const std::string &e)
                   << "login:" << arg2 << "\n"
                   << "passcode:" << arg3 << "\n^@";
             userName = arg2;
+
+            sendFrame(frame.str());
         }
-        sendFrame(frame.str());
     }
     else if (command == "join")
     {
         input >> arg1 >> endMsg; // channel_name
         if (arg1 == "")
-            frame << "ERROR\n"
-                  << "channel name is missing, you should insert channel name";
+            c.display("channel name is missing, you should insert channel name");
         else if (endMsg != "")
-            frame << "ERROR\n"
-                  << "there is unnessery data, you should insert channel name";
+            c.display("there is unnessery data, you should insert channel name");
         else
         {
             frame << "SUBSCRIBE\n"
                   << "destination:/" << arg1 << "\n"
                   << "id:unique_id\n"
                   << "receipt:receipt_id\n^@";
-        }
         sendFrame(frame.str());
+        }
     }
     else if (command == "exit")
     {
         input >> arg1 >> endMsg; // channel_name
         if (arg1 == "")
-            frame << "ERROR\n"
-                  << "channel name is missing, you should insert channel name";
+            c.display( "channel name is missing, you should insert channel name");
         else if (endMsg != "")
-            frame << "ERROR\n"
-                  << "there is unnessery data, you should insert channel name";
+            c.display("there is unnessery data, you should insert channel name");
         else
         {
             frame << "UNSUBSCRIBE\n"
                   << "id:unique_id\n"
                   << "receipt:receipt_id\n^@";
-        }
         sendFrame(frame.str());
+        }
     }
     else if (command == "report")
     {
         input >> arg1 >> endMsg; // file
         if (arg1 == "")
         {
-            frame << "ERROR\n"
-                  << "file name is missing, you should insert file name";
-            sendFrame(frame.str());
+            c.display( "file name is missing, you should insert file name");
         }
         else if (endMsg != "")
         {
-            frame << "ERROR\n"
-                  << "there is unnessery data, you should insert file name";
-            sendFrame(frame.str());
+            c.display("there is unnessery data, you should insert file name");
         }
         else
         {
@@ -124,8 +117,7 @@ void keyboardInput::createEvent(const std::string &e)
     {
         input >> endMsg; // channel_name
         if (endMsg != "")
-            frame << "ERROR\n"
-                  << "there is unnessery data, you should insert only logout command";
+            c.display( "there is unnessery data, you should insert only logout command");
         else
         {
             frame << "DISCONNECT\n"
@@ -135,8 +127,7 @@ void keyboardInput::createEvent(const std::string &e)
     }
     else
     {
-        frame << "ERROR\n"
-              << "invalid command, you can use the commands: login, join, exit, report and logout";
+        c.display( "invalid command, you can use the commands: login, join, exit, report and logout");
     }
 }
 void keyboardInput::sendFrame(const std::string &frame)

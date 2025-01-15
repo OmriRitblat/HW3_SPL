@@ -18,7 +18,14 @@ void Frame::parseStringToHashMap(const std::string &inputString)
     // Extract the first line
     if (std::getline(stream, type))
     {
-        this->type = type;
+        if (type == "ERROR")
+            this->type = ERROR;
+        else if (type == "CONNECTED")
+            this->type = CONNECTED;
+        else if (type == "MESSAGE")
+            this->type = MESSAGE;
+        else
+            this->type = RECEIPT;
     }
 
     // Loop through the remaining lines
@@ -41,7 +48,7 @@ void Frame::parseStringToHashMap(const std::string &inputString)
         else
         {
             std::string remainingContent;
-            data["body"]="";
+            data["body"] = "";
             while (std::getline(stream, remainingContent))
             {
                 if (!remainingContent.empty())
@@ -60,7 +67,7 @@ const std::string &Frame::getValue(const std::string &key) const
     return data.at(key);
 }
 
-const std::string &Frame::getType() const
+const ServerResponseType &Frame::getType() const
 {
     return type;
 }

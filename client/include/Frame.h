@@ -3,10 +3,17 @@
 #include <unordered_map>
 #include <sstream>
 
+enum ServerResponseType
+{
+    ERROR,
+    CONNECTED,
+    MESSAGE,
+    RECEIPT
+};
 class Frame
 {
 private:
-    std::string type;
+    ServerResponseType type;
     std::unordered_map<std::string, std::string> data;
 
 public:
@@ -15,6 +22,5 @@ public:
     void parseStringToHashMap(const std::string &inputString);
 
     const std::string &getValue(const std::string &key) const;
-    const std::string &Frame::getType() const;
-
+    const ServerResponseType &Frame::getType() const;
 };
