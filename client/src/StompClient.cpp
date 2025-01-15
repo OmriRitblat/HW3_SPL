@@ -3,7 +3,6 @@
 #include "../include/keyboardInput.h"
 #include "../include/ThreadSafeQueue.h"
 #include "../include/StompProtocol.h"
-
 #include <thread>
 #include <iostream>
 /**
@@ -23,8 +22,8 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 	StompProtocol protocol;
-	keyboardInput inputHandler( std::ref(eventQueue));
-	ThreadSafeQueue eventQueue;
+    ThreadSafeQueue eventQueue;
+	keyboardInput inputHandler(std::ref(eventQueue));
     std::thread inputThread(&keyboardInput::run, &inputHandler);//run input from user thread
     while (1) {
 		std::string frame=eventQueue.dequeue();
