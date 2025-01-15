@@ -14,7 +14,8 @@ private:
 std::unordered_map<std::string,std::list<Frame>> serverResponses;
 bool terminate;
 public:
-    StompProtocol(std::unordered_map<std::string,std::list<Frame>>&);
+    StompProtocol(std::unordered_map<std::string,std::list<Frame>>&, ThreadSafeHashMap_future&);
     std::string process(std::string msg); 
+    void handelRecipt(const Frame&);
     bool shouldTerminate();
 };

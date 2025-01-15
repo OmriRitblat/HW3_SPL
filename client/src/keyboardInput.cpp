@@ -7,6 +7,7 @@
 #include "../include/ThreadSafeQueue.h"
 #include "../include/CLI.h"
 #include <unordered_map>
+#include "../include/Frame.h"
 
 keyboardInput::keyboardInput(ThreadSafeQueue &q) : eventsFromUser(q), userName("") {}
 
@@ -46,7 +47,7 @@ void keyboardInput::createEvent(const std::string &e)
                   << "passcode:" << arg3 << "\n^@";
             userName = arg2;
 
-            sendFrame(frame.str());
+            sendFrame(Frame(frame.str()));
         }
     }
     else if (command == "join")
@@ -62,14 +63,14 @@ void keyboardInput::createEvent(const std::string &e)
                   << "destination:/" << arg1 << "\n"
                   << "id:unique_id\n"
                   << "receipt:receipt_id\n^@";
-        sendFrame(frame.str());
+            sendFrame(Frame(frame.str()));
         }
     }
     else if (command == "exit")
     {
         input >> arg1 >> endMsg; // channel_name
         if (arg1 == "")
-            c.display( "channel name is missing, you should insert channel name");
+            c.display("channel name is missing, you should insert channel name");
         else if (endMsg != "")
             c.display("there is unnessery data, you should insert channel name");
         else
@@ -77,7 +78,7 @@ void keyboardInput::createEvent(const std::string &e)
             frame << "UNSUBSCRIBE\n"
                   << "id:unique_id\n"
                   << "receipt:receipt_id\n^@";
-        sendFrame(frame.str());
+            sendFrame(Frame(frame.str()));
         }
     }
     else if (command == "report")
@@ -85,7 +86,7 @@ void keyboardInput::createEvent(const std::string &e)
         input >> arg1 >> endMsg; // file
         if (arg1 == "")
         {
-            c.display( "file name is missing, you should insert file name");
+            c.display("file name is missing, you should insert file name");
         }
         else if (endMsg != "")
         {
@@ -109,7 +110,7 @@ void keyboardInput::createEvent(const std::string &e)
                       << "\t" << "forces_arrival_at_scene: " << event.get_general_information().at("forces_arrival_at_scene") << "\n"
                       << "Description: " << "\n"
                       << event.get_description() << "\n";
-                sendFrame(frame.str());
+                sendFrame(Frame(frame.str()));
             }
         }
     }
@@ -117,20 +118,20 @@ void keyboardInput::createEvent(const std::string &e)
     {
         input >> endMsg; // channel_name
         if (endMsg != "")
-            c.display( "there is unnessery data, you should insert only logout command");
+            c.display("there is unnessery data, you should insert only logout command");
         else
         {
             frame << "DISCONNECT\n"
                   << "receipt:receipt_id\n^@";
-            sendFrame(frame.str());
+            sendFrame(Frame(frame.str()));
         }
     }
     else
     {
-        c.display( "invalid command, you can use the commands: login, join, exit, report and logout");
+        c.display("invalid command, you can use the commands: login, join, exit, report and logout");
     }
 }
-void keyboardInput::sendFrame(const std::string &frame)
+void keyboardInput::sendFrame(const Frame &frame)
 {
     eventsFromUser.enqueue(frame);
 }

@@ -24,6 +24,16 @@ void Frame::parseStringToHashMap(const std::string &inputString)
             this->type = CONNECTED;
         else if (type == "MESSAGE")
             this->type = MESSAGE;
+        else if (type == "CONNECT")
+            this->type = CONNECT;
+        else if (type == "SUBSCRIBE")
+            this->type = SUBSCRIBE;
+            else if (type == "UNSUBSCRIBE")
+            this->type = UNSUBSCRIBE;
+        else if (type == "SEND")
+            this->type = SEND;
+        else if (type == "DISCONNECT")
+            this->type = DISCONNECT;
         else
             this->type = RECEIPT;
     }
@@ -67,7 +77,7 @@ const std::string &Frame::getValue(const std::string &key) const
     return data.at(key);
 }
 
-const ServerResponseType &Frame::getType() const
+const CommandType &Frame::getType() const
 {
     return type;
 }
