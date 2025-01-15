@@ -15,6 +15,6 @@ public:
     void parseStringToHashMap(const std::string &inputString);
 
     const std::string &getValue(const std::string &key) const;
+    const std::string &Frame::getType() const;
 
-    const std::string &getType() const;
 };
