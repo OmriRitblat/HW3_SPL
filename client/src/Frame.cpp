@@ -4,19 +4,22 @@
 #include <sstream>
 #include "../include/Frame.h"
 
-class Frame {
-private:
-    std::unordered_map<std::string, std::string> hashMap;
+Frame::Frame(const std::string &inputString)
+{
+    parseStringToHashMap(inputString);
+}
 
-public:
-    Frame(const std::string& inputString) {
-        parseStringToHashMap(inputString);
+void Frame::parseStringToHashMap(const std::string &inputString)
+{
+
+}
+
+const std::string &Frame::getValue(const std::string &key) const
+{
+    
+}
+
+    const std::string & Frame::getType()  const{
+
     }
-
-    void parseStringToHashMap(const std::string& inputString) {
-    }
-
-    const std::string& getValue(const std::string& key) const {
-    }
-
-};
+}

@@ -3,15 +3,18 @@
 #include <unordered_map>
 #include <sstream>
 
-class Frame {
+class Frame
+{
 private:
-    std::unordered_map<std::string, std::string> hashMap;
+    std::string type;
+    std::unordered_map<std::string, std::string> data;
 
 public:
-    Frame(const std::string& inputString);
+    Frame(const std::string &inputString);
 
-    void parseStringToHashMap(const std::string& inputString);
+    void parseStringToHashMap(const std::string &inputString);
 
-    const std::string& getValue(const std::string& key) const;
+    const std::string &getValue(const std::string &key) const;
 
+    const std::string &getType() const;
 };

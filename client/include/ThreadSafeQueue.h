@@ -13,7 +13,7 @@ public:
     ThreadSafeQueue() = default;
     ~ThreadSafeQueue() = default;
 
-    void enqueue(Event item) ;
+    void enqueue(std::string item) ;
 
     std::string dequeue();
 

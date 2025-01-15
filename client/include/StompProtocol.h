@@ -1,6 +1,11 @@
 #pragma once
 
 #include "../include/ConnectionHandler.h"
+#include <iostream>
+#include <string>
+#include "../include/ConnectionHandler.h"
+#include "../include/StompProtocol.h"
+#include "../include/Frame.h"
 
 // TODO: implement the STOMP protocol
 class StompProtocol
