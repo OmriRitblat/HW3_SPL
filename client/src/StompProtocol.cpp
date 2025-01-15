@@ -6,10 +6,8 @@
 #include <list>
 #include <unordered_map>
 #include "../include/CLI.h"
-StompProtocol::StompProtocol(std::unordered_map<std::string, std::list<Frame>> &respoonses, ThreadSafeHashMap_future &recieptMap) : serverResponses(respoonses), recieptMap(recieptMap), terminate(false)
-{
-}
-std::string StompProtocol::process(std::string msg)
+StompProtocol::StompProtocol(ThreadSafeHashMap_future& f) :recieptMap(f),terminate(false){}
+Frame StompProtocol::process(std::string msg)
 {
     Frame serverMessage(msg);
     CLI c;
@@ -20,8 +18,7 @@ std::string StompProtocol::process(std::string msg)
         c.display(serverMessage.getValue("body"));
         break;
     case CommandType::MESSAGE:
-        std::string key = serverMessage.getValue("subscribtion");
-        serverResponses[key].push_back(serverMessage);
+        return serverMessage;//for updating the hashmap of events
         break;
     case CommandType::CONNECTED:
         c.display("Login succcessful");
@@ -32,6 +29,7 @@ std::string StompProtocol::process(std::string msg)
     default:
         break;
     }
+    return Frame("Null");
 }
 bool StompProtocol::shouldTerminate()
 {

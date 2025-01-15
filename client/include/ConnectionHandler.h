@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 #include <boost/asio.hpp>
+#include "StompProtocol.h"
+#include "Frame.h"
 
 using boost::asio::ip::tcp;
 
@@ -12,9 +14,10 @@ private:
 	const short port_;
 	boost::asio::io_service io_service_;   // Provides core I/O functionality
 	tcp::socket socket_;
+	StompProtocol protocol;
 
 public:
-	ConnectionHandler(std::string host, short port);
+	ConnectionHandler(std::string host, short port,ThreadSafeHashMap_future& f);
 
 	virtual ~ConnectionHandler();
 
@@ -47,5 +50,9 @@ public:
 
 	// Close down the connection properly.
 	void close();
+
+	Frame process(std::string msg);
+
+	bool shouldTerminate();
 
 }; //class ConnectionHandler
