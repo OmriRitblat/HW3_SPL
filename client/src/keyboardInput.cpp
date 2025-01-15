@@ -66,6 +66,19 @@ void keyboardInput::createEvent(const std::string &e)
             sendFrame(Frame(frame.str()));
         }
     }
+    else if (command == "summary")
+    {
+        input >> arg1 >>arg2>>arg3>> endMsg; // channel_name, user, file
+        if (arg1 == ""||arg2==""||arg3=="")
+            c.display("channel name is missing, you should insert channel name, user and output file");
+        else if (endMsg != "")
+            c.display("there is unnessery data, you should insert channel name, user and output file");
+        else
+        {
+            //handel
+            sendFrame(Frame(frame.str()));
+        }
+    }
     else if (command == "exit")
     {
         input >> arg1 >> endMsg; // channel_name

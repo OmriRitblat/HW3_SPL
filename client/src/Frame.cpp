@@ -92,12 +92,12 @@ const CommandType &Frame::getType() const
     res+="^@";
     return res;
     }
-    std::string Frame::typeToString(ServerResponseType s) {
+    std::string Frame::typeToString(CommandType s) {
     switch (s) {
-        case ServerResponseType::ERROR:   return "ERROR";
-        case ServerResponseType::CONNECTED:   return "CONNECTED";
-        case ServerResponseType::MESSAGE:   return "MESSAGE";
-        case ServerResponseType::RECEIPT:   return "RECEIPT";
+        case CommandType::ERROR:   return "ERROR";
+        case CommandType::CONNECTED:   return "CONNECTED";
+        case CommandType::MESSAGE:   return "MESSAGE";
+        case CommandType::RECEIPT:   return "RECEIPT";
         default:           return "Unknown";
     }
 }
