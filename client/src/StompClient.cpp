@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
     while (1) {
         receipt++;
 		Frame frame=eventQueue.dequeue();
-        frame.addFiled("receipt",receipt+"");
+        frame.addReceipt("receipt",receipt);
         sendMessages.put(receipt,frame);
         if (!connectionHandler.sendLine(frame.toString())) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;

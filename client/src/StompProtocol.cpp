@@ -15,18 +15,18 @@ std::string StompProtocol::process(std::string msg)
     CLI c;
     switch (serverMessage.getType())
     {
-    case ERROR:
+    case CommandType::ERROR:
         c.display("Error :\n");
         c.display(serverMessage.getValue("body"));
         break;
-    case MESSAGE:
+    case CommandType::MESSAGE:
         std::string key = serverMessage.getValue("subscribtion");
         serverResponses[key].push_back(serverMessage);
         break;
-    case CONNECTED:
+    case CommandType::CONNECTED:
         c.display("Login succcessful");
         break;
-    case RECEIPT:
+    case CommandType::RECEIPT:
         handelRecipt(serverMessage);
         break;
     default:
@@ -45,9 +45,14 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
     {
         case CommandType::SUBSCRIBE:
             c.display("Joined channel" + f.getValue("destination"));
+            break;
         case CommandType::UNSUBSCRIBE:   
             c.display("Exited channel" + f.getValue("destination"));
+            break;
         case CommandType::DISCONNECT:
             terminate=true;
+            break;
+        default:
+            break;
     }
 }

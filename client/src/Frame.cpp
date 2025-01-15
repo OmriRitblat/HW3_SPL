@@ -100,14 +100,11 @@ const CommandType &Frame::getType() const
         case CommandType::CONNECTED:   return "CONNECTED";
         case CommandType::MESSAGE:   return "MESSAGE";
         case CommandType::RECEIPT:   return "RECEIPT";
-<<<<<<< HEAD
-=======
         case CommandType::CONNECT:   return "CONNECT";
         case CommandType::SUBSCRIBE:   return "SUBSCRIBE";
         case CommandType::UNSUBSCRIBE:   return "UNSUBSCRIBE";
         case CommandType::SEND:   return "SEND";
         case CommandType::DISCONNECT:   return "DISCONNECT";
->>>>>>> refs/remotes/origin/main
         default:           return "Unknown";
     }
 }
