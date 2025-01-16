@@ -15,7 +15,6 @@ enum CommandType
     SEND,
     DISCONNECT,
     SUMMARY
-
 };
 class Frame
 {

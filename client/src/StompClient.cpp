@@ -17,15 +17,13 @@ int main (int argc, char *argv[]) {
     }
     std::string host = argv[1];
     short port = atoi(argv[2]);
-    
-    ConnectionHandler connectionHandler(host, port);
+    ThreadSafeHashMap_future sendMessages;//map of recip id and the frame
+    ConnectionHandler connectionHandler(host, port,sendMessages);
     if (!connectionHandler.connect()) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
     std::unordered_map<std::string, std::list<Frame>> server_data;
-    ThreadSafeHashMap_future sendMessages;//map of recip id and the frame
-	StompProtocol protocol(server_data,sendMessages);
     ThreadSafeQueue eventQueue;
 	keyboardInput inputHandler(std::ref(eventQueue));
     int receipt=0;
@@ -55,8 +53,10 @@ int main (int argc, char *argv[]) {
 		// A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
 		// we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
         answer.resize(len-1);
-		std::string res=protocol.process(answer);
-        if (protocol.shouldTerminate()) {
+		Frame res=connectionHandler.process(answer);
+        if(res.getType()!=CommandType::Null)
+            server_data[res.getValue("subscribtion")].push_back(res);
+        if (connectionHandler.shouldTerminate()) {
             std::cout << "Exiting...\n" << std::endl;
             break;
         }

@@ -8,8 +8,9 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), port_(port), io_service_(),
-                                                                socket_(io_service_) {}
+ConnectionHandler::ConnectionHandler(string host, short port,ThreadSafeHashMap_future& f) : host_(host), port_(port), io_service_(),
+                                                                socket_(io_service_), protocol(f){
+																}
 
 ConnectionHandler::~ConnectionHandler() {
 	close();
@@ -106,3 +107,9 @@ void ConnectionHandler::close() {
 		std::cout << "closing failed: connection already closed" << std::endl;
 	}
 }
+	Frame ConnectionHandler::process(std::string msg){
+		return protocol.process(msg);
+	}
+	    bool ConnectionHandler::shouldTerminate(){
+			return protocol.shouldTerminate();
+		}
