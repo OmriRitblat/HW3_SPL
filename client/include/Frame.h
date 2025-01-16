@@ -13,7 +13,8 @@ enum CommandType
     SUBSCRIBE,
     UNSUBSCRIBE,
     SEND,
-    DISCONNECT
+    DISCONNECT,
+    SUMMARY
 
 };
 class Frame

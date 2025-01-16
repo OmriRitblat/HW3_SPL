@@ -5,14 +5,14 @@
 #include "../include/Frame.h"
 #include <list>
 #include <unordered_map>
-#include "../include/CLI.h"
+#include "../include/OutputHandler.h"
 StompProtocol::StompProtocol(std::unordered_map<std::string, std::list<Frame>> &respoonses, ThreadSafeHashMap_future &recieptMap) : serverResponses(respoonses), recieptMap(recieptMap), terminate(false)
 {
 }
 std::string StompProtocol::process(std::string msg)
 {
     Frame serverMessage(msg);
-    CLI c;
+    OutputHandler c;
     switch (serverMessage.getType())
     {
     case CommandType::ERROR:
@@ -39,20 +39,20 @@ bool StompProtocol::shouldTerminate()
 }
 void StompProtocol::handelRecipt(const Frame &serverMessage)
 {
-    Frame f=recieptMap.get(serverMessage.getRecipt());
-    CLI c;
+    Frame f = recieptMap.get(serverMessage.getRecipt());
+    OutputHandler c;
     switch (f.getType())
     {
-        case CommandType::SUBSCRIBE:
-            c.display("Joined channel" + f.getValue("destination"));
-            break;
-        case CommandType::UNSUBSCRIBE:   
-            c.display("Exited channel" + f.getValue("destination"));
-            break;
-        case CommandType::DISCONNECT:
-            terminate=true;
-            break;
-        default:
-            break;
+    case CommandType::SUBSCRIBE:
+        c.display("Joined channel" + f.getValue("destination"));
+        break;
+    case CommandType::UNSUBSCRIBE:
+        c.display("Exited channel" + f.getValue("destination"));
+        break;
+    case CommandType::DISCONNECT:
+        terminate = true;
+        break;
+    default:
+        break;
     }
 }

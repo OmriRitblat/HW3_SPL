@@ -5,7 +5,7 @@
 #include "../include/event.h"
 #include "../include/keyboardInput.h"
 #include "../include/ThreadSafeQueue.h"
-#include "../include/CLI.h"
+#include "../include/OutputHandler.h"
 #include <unordered_map>
 #include "../include/Frame.h"
 
@@ -25,7 +25,7 @@ void keyboardInput::run(ThreadSafeQueue &t)
 
 void keyboardInput::createEvent(const std::string &e)
 {
-    CLI c;
+    OutputHandler c;
     std::istringstream input(e);
     std::string command, arg1, arg2, arg3, endMsg;
     input >> command;
@@ -44,7 +44,7 @@ void keyboardInput::createEvent(const std::string &e)
                   << "accept-version:1.2\n"
                   << "host:" << arg1 << "\n"
                   << "login:" << arg2 << "\n"
-                  << "passcode:" << arg3 << "\n^@";
+                  << "passcode:" << arg3 << "\n";
             userName = arg2;
 
             sendFrame(Frame(frame.str()));
@@ -60,9 +60,7 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "SUBSCRIBE\n"
-                  << "destination:/" << arg1 << "\n"
-                  << "id:unique_id\n"
-                  << "receipt:receipt_id\n^@";
+                  << "destination:/" << arg1 << "\n";
             sendFrame(Frame(frame.str()));
         }
     }
@@ -75,7 +73,10 @@ void keyboardInput::createEvent(const std::string &e)
             c.display("there is unnessery data, you should insert channel name, user and output file");
         else
         {
-            //handel
+             frame << "SUMMARY\n"
+                  << "channel_name: "<<arg1<<"\n"
+                  << "user: "<<arg2<<"\n"
+                  << "file: "<<arg3<<"\n";
             sendFrame(Frame(frame.str()));
         }
     }
@@ -89,8 +90,7 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "UNSUBSCRIBE\n"
-                  << "id:unique_id\n"
-                  << "receipt:receipt_id\n^@";
+                  <<"channel_name: "<<arg1<<"\n";
             sendFrame(Frame(frame.str()));
         }
     }
@@ -134,8 +134,7 @@ void keyboardInput::createEvent(const std::string &e)
             c.display("there is unnessery data, you should insert only logout command");
         else
         {
-            frame << "DISCONNECT\n"
-                  << "receipt:receipt_id\n^@";
+            frame << "DISCONNECT\n";
             sendFrame(Frame(frame.str()));
         }
     }

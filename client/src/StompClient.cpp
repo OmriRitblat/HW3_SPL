@@ -33,6 +33,9 @@ int main (int argc, char *argv[]) {
     while (1) {
         receipt++;
 		Frame frame=eventQueue.dequeue();
+        
+        if(frame.getType==SUMMARY)
+
         frame.addReceipt("receipt",receipt);
         sendMessages.put(receipt,frame);
         if (!connectionHandler.sendLine(frame.toString())) {
