@@ -1,27 +1,26 @@
-CFLAGS:=-c -Wall -Weffc++ -g -std=c++11 -Iinclude
-LDFLAGS:=-lboost_system -lpthread
-# TODO change the makefile for StompEMIlient
-all: EchoClient
+CFLAGS := -c -Wall -Weffc++ -g -std=c++11 -Iinclude
+LDFLAGS := -lboost_system -lpthread
+BIN_DIR := bin
 
-EchoClient: bin/ConnectionHandler.o bin/echoClient.o
-	g++ -o bin/EchoClient bin/ConnectionHandler.o bin/echoClient.o $(LDFLAGS)
+# Default target
+all: Client StompWCIClient
 
-StompWCIClient: bin/ConnectionHandler.o bin/StompClient.o bin/event.o
-	g++ -o bin/StompWCIClient bin/ConnectionHandler.o bin/StompClient.o $(LDFLAGS)
+# Client target
+Client: $(BIN_DIR)/StompClient.o $(BIN_DIR)/ConnectionHandler.o $(BIN_DIR)/StompProtocol.o $(BIN_DIR)/ThreadSafeHashMap_future.o $(BIN_DIR)/keyboardInput.o $(BIN_DIR)/OutputHandler.o $(BIN_DIR)/Frame.o $(BIN_DIR)/ThreadSafeQueue.o $(BIN_DIR)/DataHandler.o $(BIN_DIR)/event.o
+	mkdir -p $(BIN_DIR)
+	g++ -o $(BIN_DIR)/Client $^ $(LDFLAGS)
 
-bin/ConnectionHandler.o: src/ConnectionHandler.cpp
-	g++ $(CFLAGS) -o bin/ConnectionHandler.o src/ConnectionHandler.cpp
+# StompWCIClient target
+StompWCIClient: $(BIN_DIR)/ConnectionHandler.o $(BIN_DIR)/StompClient.o $(BIN_DIR)/event.o $(BIN_DIR)/ThreadSafeQueue.o $(BIN_DIR)/Frame.o $(BIN_DIR)/StompProtocol.o $(BIN_DIR)/ThreadSafeHashMap_future.o $(BIN_DIR)/keyboardInput.o $(BIN_DIR)/OutputHandler.o $(BIN_DIR)/DataHandler.o
+	mkdir -p $(BIN_DIR)
+	g++ -o $(BIN_DIR)/StompWCIClient $^ $(LDFLAGS)
 
-bin/echoClient.o: src/echoClient.cpp
-	g++ $(CFLAGS) -o bin/echoClient.o src/echoClient.cpp
+# Generic rule to compile .cpp files into .o files
+$(BIN_DIR)/%.o: src/%.cpp
+	mkdir -p $(BIN_DIR)
+	g++ $(CFLAGS) -o $@ $<
 
-bin/event.o: src/event.cpp
-	g++ $(CFLAGS) -o bin/event.o src/event.cpp
-
-bin/StompClient.o: src/StompClient.cpp
-	g++ $(CFLAGS) -o bin/StompClient.o src/StompClient.cpp
-
+# Clean up build files
 .PHONY: clean
 clean:
-	rm -f bin/*
-	
+	rm -rf $(BIN_DIR)

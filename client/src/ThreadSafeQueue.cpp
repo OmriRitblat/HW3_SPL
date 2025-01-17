@@ -2,7 +2,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "event.h"
-#include "client/include/ThreadSafeQueue.h"
+#include "../include/ThreadSafeQueue.h"
 
 
     void ThreadSafeQueue::enqueue(std::string item) {

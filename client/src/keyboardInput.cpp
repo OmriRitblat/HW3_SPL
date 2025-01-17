@@ -11,7 +11,7 @@
 
 keyboardInput::keyboardInput(ThreadSafeQueue &q) : eventsFromUser(q), userName("") {}
 
-void keyboardInput::run(ThreadSafeQueue &t)
+void keyboardInput::run()
 {
     while (1)
     {
@@ -46,8 +46,8 @@ void keyboardInput::createEvent(const std::string &e)
                   << "login:" << arg2 << "\n"
                   << "passcode:" << arg3 << "\n";
             userName = arg2;
-
-            sendFrame(Frame(frame.str()));
+            Frame f(frame.str());
+            sendFrame(f);
         }
     }
     else if (command == "join")
@@ -61,7 +61,8 @@ void keyboardInput::createEvent(const std::string &e)
         {
             frame << "SUBSCRIBE\n"
                   << "destination:/" << arg1 << "\n";
-            sendFrame(Frame(frame.str()));
+            Frame f(frame.str());
+            sendFrame(f);
         }
     }
     else if (command == "summary")
@@ -77,7 +78,8 @@ void keyboardInput::createEvent(const std::string &e)
                   << "channel_name: "<<arg1<<"\n"
                   << "user: "<<arg2<<"\n"
                   << "file: "<<arg3<<"\n";
-            sendFrame(Frame(frame.str()));
+            Frame f(frame.str());
+            sendFrame(f);
         }
     }
     else if (command == "exit")
@@ -91,7 +93,8 @@ void keyboardInput::createEvent(const std::string &e)
         {
             frame << "UNSUBSCRIBE\n"
                   <<"id: "<<arg1<<"\n";
-            sendFrame(Frame(frame.str()));
+            Frame f(frame.str());
+            sendFrame(f);
         }
     }
     else if (command == "report")
@@ -123,7 +126,8 @@ void keyboardInput::createEvent(const std::string &e)
                       << "\t" << "forces_arrival_at_scene: " << event.get_general_information().at("forces_arrival_at_scene") << "\n"
                       << "Description: " << "\n"
                       << event.get_description() << "\n";
-                sendFrame(Frame(frame.str()));
+                Frame f(frame.str());
+                sendFrame(f);
             }
         }
     }
@@ -135,7 +139,8 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "DISCONNECT\n";
-            sendFrame(Frame(frame.str()));
+            Frame f(frame.str());
+            sendFrame(f);
         }
     }
     else
@@ -143,7 +148,12 @@ void keyboardInput::createEvent(const std::string &e)
         c.display("invalid command, you can use the commands: login, join, exit, report and logout");
     }
 }
-void keyboardInput::sendFrame(const Frame &frame)
+void keyboardInput::sendFrame(Frame &frame)
 {
-    eventsFromUser.enqueue(frame);
+    try {
+        std::string frameStr = frame.toString();  // Safely call toString()
+        eventsFromUser.enqueue(frameStr);        // Enqueue the frame string
+    } catch (const std::exception &e) {
+        std::cerr << "Error in sendFrame: " << e.what() << std::endl;
+    }
 }

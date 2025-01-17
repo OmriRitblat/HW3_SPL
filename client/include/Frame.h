@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <unordered_map>
@@ -23,14 +25,14 @@ private:
     CommandType type;
     std::unordered_map<std::string, std::string> data;
     int receipt;
+    std::string toStringVal;
 
 public:
+    Frame() = default;
     Frame(const std::string &inputString);
-    
     void parseStringToHashMap(const std::string &inputString);
-
     const std::string &getValue(const std::string &key) const;
-    const CommandType &Frame::getType() const;
+    const CommandType &getType() const;
     const void addReceipt(std::string key, int value);
     std::string& toString();
     std::string typeToString(CommandType s);

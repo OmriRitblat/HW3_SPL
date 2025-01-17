@@ -1,8 +1,11 @@
+#pragma once
+
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include "event.h"
 #include "../include/Frame.h"
+#include "../include/ThreadSafeQueue.h"
 
 class ThreadSafeQueue
 {

@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     std::unordered_map<std::string, std::string> channelNumber;    //<channel name,subscibtion id>
     int channelSubCount = 0;
     ThreadSafeQueue eventQueue;
-    keyboardInput inputHandler(std::ref(eventQueue));
+    keyboardInput inputHandler(eventQueue);
     int receipt = 0;
     std::thread inputThread(&keyboardInput::run, &inputHandler); // run input from user thread
     while (1)

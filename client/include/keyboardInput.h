@@ -13,8 +13,7 @@ private:
 
 public:
     keyboardInput(ThreadSafeQueue &q);
-    virtual ~keyboardInput();
-    void run(ThreadSafeQueue &t);
-    void sendFrame(const Frame &frame);
+    void run();
+    void sendFrame(Frame &frame);
     void createEvent(const std::string &e);
 };
