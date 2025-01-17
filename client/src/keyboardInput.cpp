@@ -129,7 +129,7 @@ void keyboardInput::createEvent(const std::string &e)
     }
     else if (command == "logout")
     {
-        input >> endMsg; // channel_name
+        input >> endMsg;
         if (endMsg != "")
             c.display("there is unnessery data, you should insert only logout command");
         else

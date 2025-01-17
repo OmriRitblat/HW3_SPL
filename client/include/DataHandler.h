@@ -9,5 +9,8 @@ private:
     std::unordered_map<std::string, std::list<Frame>> &serverMessages;
 
 public:
-    void sendAllData(std::unordered_map<std::string, std::list<Frame>> &serverResponses,const std::string& user,const std::string& channel_name,const std::string& fileName)const;
+    DataHandler(std::unordered_map<std::string, std::list<Frame>> &);
+    std::string getSummary(const std::string &, const std::string &) const;
+    std::string formatDateTime(std::string) const;
+    std::string formatSummary(std::string) const;
 };
