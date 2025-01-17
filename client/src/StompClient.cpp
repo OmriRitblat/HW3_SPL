@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "../include/ConnectionHandler.h"
+
 #include "../include/keyboardInput.h"
 #include "../include/ThreadSafeQueue.h"
 #include "../include/ThreadSafeHashMap_future.h"
@@ -28,6 +28,8 @@ int main(int argc, char *argv[])
         return 1;
     }
     std::unordered_map<std::string, std::list<Frame>> server_data; //<user name,all frames send from>
+    std::unordered_map<std::string, std::string> channelNumber;    //<channel name,subscibtion id>
+    int channelSubCount = 0;
     ThreadSafeQueue eventQueue;
     keyboardInput inputHandler(std::ref(eventQueue));
     int receipt = 0;
@@ -38,13 +40,28 @@ int main(int argc, char *argv[])
         if (frame.getType == SUMMARY)
         {
             DataHandler data(server_data);
-            string user=frame.getValue("user");
-            string channel=frame.getValue("channel_name");
-            string file=frame.getValue("file");
-            c.printToFile(data.getSummary(user,channel),file);
+            string user = frame.getValue("user");
+            string channel = frame.getValue("channel_name");
+            string file = frame.getValue("file");
+            c.printToFile(data.getSummary(user, channel), file);
         }
         else
         {
+            if (frame.getType == SUBSCRIBE)
+            {
+                channelNumber[frame.getValue("destination")] = std::to_string(channelSubCount);
+                channelSubCount++;
+            }
+            if (frame.getType == UNSUBSCRIBE)
+            {
+                frame.setValueAt("id", channelNumber[frame.getValue("id")]);
+                auto it = channelNumber.find("key2");
+
+                if (it != channelNumber.end())
+                {
+                    channelNumber.erase(it);
+                }
+            }
             receipt++;
             frame.addReceipt("receipt", receipt);
             sendMessages.put(receipt, frame);

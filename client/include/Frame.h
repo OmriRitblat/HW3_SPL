@@ -34,4 +34,5 @@ public:
     std::string& toString();
     std::string typeToString(CommandType s);
     int getRecipt() const;
+    void setValueAt(const std::string&,const std::string&);
 };

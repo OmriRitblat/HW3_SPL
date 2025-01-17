@@ -90,7 +90,7 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "UNSUBSCRIBE\n"
-                  <<"channel_name: "<<arg1<<"\n";
+                  <<"id: "<<arg1<<"\n";
             sendFrame(Frame(frame.str()));
         }
     }

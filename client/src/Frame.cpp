@@ -8,6 +8,9 @@ Frame::Frame(const std::string &inputString)
 {
     parseStringToHashMap(inputString);
 }
+void Frame::setValueAt(const std::string& field,const std::string& value){
+    data[field]=value;
+}
 
 void Frame::parseStringToHashMap(const std::string &inputString)
 {
