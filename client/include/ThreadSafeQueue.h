@@ -15,7 +15,7 @@ public:
     ThreadSafeQueue() = default;
     ~ThreadSafeQueue() = default;
 
-    void enqueue(Frame item);
+    void enqueue(std::string item);
 
     std::string dequeue();
 

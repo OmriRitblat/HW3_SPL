@@ -14,7 +14,7 @@
     std::string ThreadSafeQueue::dequeue() {
         std::unique_lock<std::mutex> lock(mutex_);
         condition_.wait(lock, [this]() { return !queue_.empty(); }); // Wait until queue is not empty
-        std::string item = std::move(queue_.front());
+        std::string item = std::move(queue_.front()).toString();
         queue_.pop();
         return item;
     }
