@@ -19,6 +19,8 @@ public class Reactor<T> implements Server<T> {
     private final Supplier<MessageEncoderDecoder<T>> readerFactory;
     private final ActorThreadPool pool;
     private Selector selector;
+    private Connection con;
+    private int idCounter;
 
     private Thread selectorThread;
     private final ConcurrentLinkedQueue<Runnable> selectorTasks = new ConcurrentLinkedQueue<>();
@@ -30,9 +32,11 @@ public class Reactor<T> implements Server<T> {
             Supplier<MessageEncoderDecoder<T>> readerFactory) {
 
         this.pool = new ActorThreadPool(numThreads);
+        this.con = new ConnectionImp();
         this.port = port;
         this.protocolFactory = protocolFactory;
         this.readerFactory = readerFactory;
+        this.idCounter=0;
     }
 
     @Override
@@ -99,8 +103,11 @@ public class Reactor<T> implements Server<T> {
                 readerFactory.get(),
                 protocolFactory.get(),
                 clientChan,
-                this);
+                this,
+                idCounter);
         clientChan.register(selector, SelectionKey.OP_READ, handler);
+        con.addConnect(idCounter,handler);
+        idCounter++;
     }
 
     private void handleReadWrite(SelectionKey key) {
@@ -128,6 +135,20 @@ public class Reactor<T> implements Server<T> {
     @Override
     public void close() throws IOException {
         selector.close();
+    }
+
+    //TODO: update after implement protocol
+    public void handleResponse(int id, T msg){
+        if(true){ //check if the message is broadcase
+            String channelName="";//get the channel from the message
+            con.send(channelName,msg);
+        }
+        else
+            con.send(id,msg);
+    }
+
+    public void handleDisconnect(int id){
+        con.disconnect(id);
     }
 
 }

@@ -25,5 +25,9 @@ public class ConnectionImp<T> {
         clients.remove(connectionId);
         //should remove from subscibtion also?
     }
+
+    public void addConnect(int connectionId,ConnectionHandler ch){
+        clients.put(connectionId,ch);
+    }
     
 }

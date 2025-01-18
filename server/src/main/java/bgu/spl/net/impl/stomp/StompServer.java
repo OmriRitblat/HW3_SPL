@@ -42,6 +42,6 @@ public class StompServer {
                 () -> new MessageEncoderDecoderImpl()
             );
         }
-        server.server();
+        server.serve();
     }
 }
