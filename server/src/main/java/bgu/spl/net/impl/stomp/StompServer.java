@@ -14,6 +14,7 @@ public class StompServer {
         try {
             port = Integer.parseInt(args);
             serverType = args[1].toLowerCase();
+
         } catch (NumberFormatException e) {
             System.out.println("Invalid port number: " + args);
             return;
@@ -24,22 +25,18 @@ public class StompServer {
             return;
         }
 
-
-        // Initialize the required factories
-        MessageEncoderDecoder<String> encoderDecoder = new MessageEncoderDecoderImpl();
-        StompMessagingProtocol<String> protocol = new StompMessagingProtocolImpl();
         Server<String> server;
 
         if (serverType.equals("tpc")) {
-                server = new BaseServer(
+            server =Server.threadPerClient(
                 port,
                 () -> new StompMessagingProtocolImpl(),
                 () -> new MessageEncoderDecoderImpl()
             );
         }
         else if(serverType.equals("reactor")){
-            server = new Reactor(
-                Runtime.getRuntime().availableProcessors(),
+            server = Server.reactor(
+                10,
                 port,
                 () -> new StompMessagingProtocolImpl(),
                 () -> new MessageEncoderDecoderImpl()
