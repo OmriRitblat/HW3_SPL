@@ -84,18 +84,18 @@ const CommandType &Frame::getType() const
 {
     return type;
 }
-    const void Frame::addReceipt(std::string key, int value){
-        std::string val=value+"";
-        data.insert(key,val);
-        receipt=value;
-    }
+    const void Frame::addReceipt(std::string key, int value) {
+    std::string val = std::to_string(value); 
+    data.insert({key, val}); 
+    receipt = value; 
+}
     std::string& Frame::toString(){
-        std::string res=typeToString(type)+"\n";
+        toStringVal=typeToString(type)+"\n";
         for (const auto& [key, value] : data) {
-        res+=""+key+": "+""+value+"\n";
+        toStringVal+=""+key+": "+""+value+"\n";
     }
-    res+="^@";
-    return res;
+    toStringVal+="^@";
+    return toStringVal;
     }
     std::string Frame::typeToString(CommandType s) {
     switch (s) {

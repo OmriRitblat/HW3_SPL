@@ -1,5 +1,6 @@
 #include "../include/ConnectionHandler.h"
-
+#include "../include/OutputHandler.h"
+#include "../include/DataHandler.h"
 #include "../include/keyboardInput.h"
 #include "../include/ThreadSafeQueue.h"
 #include "../include/ThreadSafeHashMap_future.h"
@@ -8,6 +9,7 @@
 #include <thread>
 #include <iostream>
 #include <list>
+#include <string>
 
 int main(int argc, char *argv[])
 {
@@ -31,28 +33,28 @@ int main(int argc, char *argv[])
     std::unordered_map<std::string, std::string> channelNumber;    //<channel name,subscibtion id>
     int channelSubCount = 0;
     ThreadSafeQueue eventQueue;
-    keyboardInput inputHandler(std::ref(eventQueue));
+    keyboardInput inputHandler(eventQueue);
     int receipt = 0;
     std::thread inputThread(&keyboardInput::run, &inputHandler); // run input from user thread
     while (1)
     {
         Frame frame = eventQueue.dequeue();
-        if (frame.getType == SUMMARY)
+        if (frame.getType() == SUMMARY)
         {
             DataHandler data(server_data);
-            string user = frame.getValue("user");
-            string channel = frame.getValue("channel_name");
-            string file = frame.getValue("file");
+            std::string user = frame.getValue("user");
+            std::string channel = frame.getValue("channel_name");
+            std::string file = frame.getValue("file");
             c.printToFile(data.getSummary(user, channel), file);
         }
         else
         {
-            if (frame.getType == SUBSCRIBE)
+            if (frame.getType() == SUBSCRIBE)
             {
                 channelNumber[frame.getValue("destination")] = std::to_string(channelSubCount);
                 channelSubCount++;
             }
-            if (frame.getType == UNSUBSCRIBE)
+            if (frame.getType() == UNSUBSCRIBE)
             {
                 frame.setValueAt("id", channelNumber[frame.getValue("id")]);
                 auto it = channelNumber.find("key2");
@@ -71,7 +73,7 @@ int main(int argc, char *argv[])
                           << std::endl;
                 break;
             }
-            std::cout << "Sent " << frame << " /n" << "to server" << std::endl;
+            std::cout << "Sent " << frame.toString() << "\n" << "to server" << std::endl;
             std::string answer;
             // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
             // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
@@ -81,7 +83,6 @@ int main(int argc, char *argv[])
                           << std::endl;
                 break;
             }
-
             int len = answer.length();
             // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
             // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
