@@ -11,10 +11,9 @@
 }
     Frame ThreadSafeHashMap_future::get(const int& key) const {
     std::lock_guard<std::mutex> lock(mapMutex);
-
     auto it = map.find(key);
     if (it != map.end()) {
-        return it->second;
+        return map.at(key);
     }
 }
 

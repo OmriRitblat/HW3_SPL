@@ -15,7 +15,7 @@ Frame StompProtocol::process(std::string msg)
     {
     case CommandType::ERROR:
         c.display("Error :\n");
-        c.display(serverMessage.getValue("body"));
+        c.display(serverMessage.getValue("message"));
         break;
     case CommandType::MESSAGE:
         return serverMessage;//for updating the hashmap of events
@@ -54,3 +54,7 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
         break;
     }
 }
+    void StompProtocol::setTerminate(){
+        terminate=true;
+    }
+

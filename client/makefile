@@ -18,7 +18,10 @@ StompWCIClient: $(BIN_DIR)/ConnectionHandler.o $(BIN_DIR)/StompClient.o $(BIN_DI
 # Generic rule to compile .cpp files into .o files
 $(BIN_DIR)/%.o: src/%.cpp
 	mkdir -p $(BIN_DIR)
-	g++ $(CFLAGS) -o $@ $<
+	g++ $(CFLAGS) -MMD -MF $(@:.o=.d) -o $@ $<
+
+# Include generated dependency files
+-include $(BIN_DIR)/*.d
 
 # Clean up build files
 .PHONY: clean

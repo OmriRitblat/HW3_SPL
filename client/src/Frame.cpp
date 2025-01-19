@@ -46,17 +46,15 @@ void Frame::parseStringToHashMap(const std::string &inputString)
     {
         if (!line.empty())
         {
-            std::istringstream lineStream(line);
-            std::string key, value;
-            lineStream >> key;
-            std::getline(lineStream, value);
-
-            // Trim leading space from value
-            if (!value.empty() && value[0] == ' ')
+            size_t pos = line.find(':');
+            std::string key = line.substr(0, pos);
+            std::string value = line.substr(pos + 1);
+            if (key=="receipt-id")
             {
-                value.erase(0, 1);
+                receipt=std::stoi(value);
+            }else{
+                data[key] = value;
             }
-            data[key] = value;
         }
         else
         {
@@ -92,9 +90,8 @@ const CommandType &Frame::getType() const
     std::string& Frame::toString(){
         toStringVal=typeToString(type)+"\n";
         for (const auto& [key, value] : data) {
-        toStringVal+=""+key+": "+""+value+"\n";
+        toStringVal+=""+key+":"+""+value+"\n";
     }
-    toStringVal+="^@";
     return toStringVal;
     }
     std::string Frame::typeToString(CommandType s) {

@@ -8,9 +8,11 @@ public class ConnectionImp<T> {
     private ConcurrentHashMap<String, List<Integer>> subsribtion; //<channel name, list<connection id>>
 
     public boolean send(int connectionId, T msg){
-        ConnectionHandler c=clients.get(connectionId)
-        if(c!=null)
-            return c.send(msg);
+        ConnectionHandler c=clients.get(connectionId);
+        if(c!=null){
+             c.send(msg);
+             return true;
+        }
         return false;
     }
 

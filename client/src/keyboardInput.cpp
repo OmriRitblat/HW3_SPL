@@ -60,7 +60,8 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "SUBSCRIBE\n"
-                  << "destination:/" << arg1 << "\n";
+                  << "destination:/topic/" << arg1 << "\n"
+                  << "id:-";
             Frame f(frame.str());
             sendFrame(f);
         }
@@ -75,9 +76,9 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
              frame << "SUMMARY\n"
-                  << "channel_name: "<<arg1<<"\n"
-                  << "user: "<<arg2<<"\n"
-                  << "file: "<<arg3<<"\n";
+                  << "channel_name:"<<arg1<<"\n"
+                  << "user:"<<arg2<<"\n"
+                  << "file:"<<arg3<<"\n";
             Frame f(frame.str());
             sendFrame(f);
         }
@@ -92,7 +93,7 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "UNSUBSCRIBE\n"
-                  <<"id: "<<arg1<<"\n";
+                  <<"id:"<<arg1<<"\n";
             Frame f(frame.str());
             sendFrame(f);
         }
@@ -117,14 +118,14 @@ void keyboardInput::createEvent(const std::string &e)
                 const Event &event = allEvents.events[i];
                 frame << "SEND" << "\n"
                       << "destination:" << allEvents.channel_name << "\n\n"
-                      << "user: " << userName << "\n"
-                      << "city: " << event.get_city() << "\n"
-                      << "event name: " << event.get_name() << "\n"
-                      << "date time: " << event.get_date_time() << "\n"
-                      << "genetal information: " << "\n"
-                      << "\t" << "active: " << event.get_general_information().at("active") << "\n"
-                      << "\t" << "forces_arrival_at_scene: " << event.get_general_information().at("forces_arrival_at_scene") << "\n"
-                      << "Description: " << "\n"
+                      << "user:" << userName << "\n"
+                      << "city:" << event.get_city() << "\n"
+                      << "event name:" << event.get_name() << "\n"
+                      << "date time:" << event.get_date_time() << "\n"
+                      << "genetal information:" << "\n"
+                      << "\t" << "active:" << event.get_general_information().at("active") << "\n"
+                      << "\t" << "forces_arrival_at_scene:" << event.get_general_information().at("forces_arrival_at_scene") << "\n"
+                      << "Description:" << "\n"
                       << event.get_description() << "\n";
                 Frame f(frame.str());
                 sendFrame(f);
@@ -151,8 +152,7 @@ void keyboardInput::createEvent(const std::string &e)
 void keyboardInput::sendFrame(Frame &frame)
 {
     try {
-        std::string frameStr = frame.toString();  // Safely call toString()
-        eventsFromUser.enqueue(frameStr);        // Enqueue the frame string
+        eventsFromUser.enqueue(frame);        // Enqueue the frame string
     } catch (const std::exception &e) {
         std::cerr << "Error in sendFrame: " << e.what() << std::endl;
     }
