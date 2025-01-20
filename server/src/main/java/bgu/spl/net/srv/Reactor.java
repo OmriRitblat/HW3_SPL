@@ -19,7 +19,7 @@ public class Reactor<T> implements Server<T> {
     private final Supplier<MessageEncoderDecoder<T>> readerFactory;
     private final ActorThreadPool pool;
     private Selector selector;
-    private Connection con;
+    private ConnectionImp con;
     private int idCounter;
 
     private Thread selectorThread;
@@ -135,16 +135,6 @@ public class Reactor<T> implements Server<T> {
     @Override
     public void close() throws IOException {
         selector.close();
-    }
-
-    //TODO: update after implement protocol
-    public void handleResponse(int id, T msg){
-        if(true){ //check if the message is broadcase
-            String channelName="";//get the channel from the message
-            con.send(channelName,msg);
-        }
-        else
-            con.send(id,msg);
     }
 
     public void handleDisconnect(int id){
