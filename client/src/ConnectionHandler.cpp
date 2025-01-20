@@ -25,7 +25,6 @@ bool ConnectionHandler::connect() {
         if (error)
             throw boost::system::system_error(error);
 
-        socket_.non_blocking(true);
     } catch (std::exception &e) {
         std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
         return false;
@@ -34,28 +33,19 @@ bool ConnectionHandler::connect() {
 }
 
 bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
-    size_t tmp = 0;
-    boost::system::error_code error;
-
-    while (bytesToRead > tmp) {
-        size_t bytesRead = socket_.read_some(boost::asio::buffer(bytes + tmp, bytesToRead - tmp), error);
-
-        if (error) {
-            if (error == boost::asio::error::would_block) {
-                // No data available yet, return false to indicate the caller should retry
-                return false;
-            } else {
-                // Other errors are fatal
-                std::cerr << "recv failed (Error: " << error.message() << ')' << std::endl;
-                protocol.setTerminate();
-                return false;
-            }
-        }
-
-        tmp += bytesRead; // Increment the number of bytes read
-    }
-
-    return true;
+	size_t tmp = 0;
+	boost::system::error_code error;
+	try {
+		while (!error && bytesToRead > tmp) {
+			tmp += socket_.read_some(boost::asio::buffer(bytes + tmp, bytesToRead - tmp), error);
+		}
+		if (error)
+			throw boost::system::system_error(error);
+	} catch (std::exception &e) {
+		std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
+		return false;
+	}
+	return true;
 }
 
 bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
@@ -73,6 +63,8 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 	}
 	return true;
 }
+
+
 
 bool ConnectionHandler::getLine(std::string &line) {
     return getFrameAscii(line, '\0');
@@ -118,3 +110,8 @@ void ConnectionHandler::close() {
 	    bool ConnectionHandler::shouldTerminate(){
 			return protocol.shouldTerminate();
 	}
+bool ConnectionHandler::hasDataToRead() {
+    boost::asio::socket_base::bytes_readable command(true); // Request bytes available to read
+    socket_.io_control(command); // Query the socket for available data
+    return command.get() > 0; // Returns true if there's data to read
+}

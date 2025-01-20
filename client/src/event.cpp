@@ -8,6 +8,9 @@
 #include <sstream>
 #include <cstring>
 
+#include <unistd.h>
+#include <limits.h>
+
 #include "../include/keyboardInput.h"
 
 using namespace std;
@@ -124,6 +127,14 @@ Event::Event(const std::string &frame_body): channel_name(""), city(""),
 
 names_and_events parseEventsFile(std::string json_path)
 {
+    char buffer[PATH_MAX];
+    if (getcwd(buffer, sizeof(buffer)) != nullptr) {
+        std::cout << "Current working directory: " << buffer << std::endl;
+    } else {
+        perror("getcwd");
+    }
+
+
     std::ifstream f(json_path);
     json data = json::parse(f);
 

@@ -60,7 +60,7 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "SUBSCRIBE\n"
-                  << "destination:/topic/" << arg1 << "\n"
+                  << "destination:" << arg1 << "\n"
                   << "id:-";
             Frame f(frame.str());
             sendFrame(f);
@@ -117,7 +117,7 @@ void keyboardInput::createEvent(const std::string &e)
                 frame.clear();
                 const Event &event = allEvents.events[i];
                 frame << "SEND" << "\n"
-                      << "destination:" << allEvents.channel_name << "\n\n"
+                      << "destination:/" << allEvents.channel_name << "\n\n"
                       << "user:" << userName << "\n"
                       << "city:" << event.get_city() << "\n"
                       << "event name:" << event.get_name() << "\n"

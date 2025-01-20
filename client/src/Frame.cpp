@@ -29,6 +29,8 @@ void Frame::parseStringToHashMap(const std::string &inputString)
             this->type = MESSAGE;
         else if (type == "CONNECT")
             this->type = CONNECT;
+        else if (type == "SUMMARY")
+            this->type = SUMMARY;
         else if (type == "SUBSCRIBE")
             this->type = SUBSCRIBE;
             else if (type == "UNSUBSCRIBE")

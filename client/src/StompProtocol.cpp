@@ -41,12 +41,18 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
     OutputHandler c;
     switch (f.getType())
     {
-    case CommandType::SUBSCRIBE:
-        c.display("Joined channel" + f.getValue("destination"));
+    case CommandType::SUBSCRIBE:{
+        size_t pos = f.getValue("destination").find_last_of('/');
+        std::string result = (pos != std::string::npos) ? f.getValue("destination").substr(pos + 1) : f.getValue("destination");
+        c.display("Joined channel " + result);
         break;
-    case CommandType::UNSUBSCRIBE:
-        c.display("Exited channel" + f.getValue("destination"));
+    }
+    case CommandType::UNSUBSCRIBE:{
+        size_t pos = f.getValue("destination").find_last_of('/');
+        std::string result = (pos != std::string::npos) ? f.getValue("destination").substr(pos + 1) : f.getValue("destination");
+        c.display("Exited channel " + result);
         break;
+    }
     case CommandType::DISCONNECT:
         terminate = true;
         break;

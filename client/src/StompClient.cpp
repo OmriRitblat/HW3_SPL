@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 {
     OutputHandler c;
     ThreadSafeHashMap_future sendMessages; // map of recip id and the frame
-    std::unordered_map<std::string, std::list<Frame>> server_data; //<user name,all frames send from>
+    std::unordered_map<std::string, std::list<Frame>> server_data; //<chanel name ,all frames send to this chanel>
     std::unordered_map<std::string, std::string> channelNumber;    //<channel name,subscibtion id>
     int channelSubCount = 0;
     ThreadSafeQueue eventQueue;
@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
             connectionHandler =new ConnectionHandler(host, port, sendMessages);
             if (!(*connectionHandler).connect())
             {
-            std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
-            return 1;
+                std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
+                return 1;
             }
             frame.setValueAt("host","stomp.cs.bgu.ac.il");
         }
@@ -77,18 +77,19 @@ int main(int argc, char *argv[])
             std::string answer;
             // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
             // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
-            while ((*connectionHandler).getLine(answer))
-            {
+           
+            do{
+                (*connectionHandler).getLine(answer);
                     // std::cout << answer << std::endl;
                 int len = answer.length();
                 // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
                 // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
-                answer.resize(len - 1);
                 Frame answerFrame(answer);
                 Frame res = (*connectionHandler).process(answer);
-                if (answerFrame.getType() == CommandType::SEND)
-                    server_data[res.getValue("user")].push_back(res);
-            }
+                if (answerFrame.getType() == CommandType::MESSAGE)
+                    server_data[res.getValue("destination")].push_back(res);
+                answer="";
+            } while (connectionHandler->hasDataToRead());
             if ((*connectionHandler).shouldTerminate())
             {
                 std::cout << "Exiting...\n"
