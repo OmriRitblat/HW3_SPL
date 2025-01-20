@@ -5,18 +5,18 @@
 #include "../include/ThreadSafeQueue.h"
 
 
-    void ThreadSafeQueue::enqueue(std::string item) {
+    void ThreadSafeQueue::enqueue(Frame &frame) {
         std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push(std::move(item));
+        queue_.push(frame);
         condition_.notify_one();
     }
 
-    std::string ThreadSafeQueue::dequeue() {
+    Frame ThreadSafeQueue::dequeue(){
         std::unique_lock<std::mutex> lock(mutex_);
         condition_.wait(lock, [this]() { return !queue_.empty(); }); // Wait until queue is not empty
-        std::string item = std::move(queue_.front()).toString();
+        Frame front = queue_.front(); // Access the front element as an lvalue
         queue_.pop();
-        return item;
+        return front;
     }
 
     bool ThreadSafeQueue::empty() const {

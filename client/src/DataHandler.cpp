@@ -12,9 +12,9 @@ std::string DataHandler::getSummary(const std::string &user, const std::string &
     int activeCount = 0;
     int forceCount = 0;
     std::list<Frame> reports;
-    for (const auto &frame : serverMessages[user])
+    for (const auto &frame : serverMessages[channel_name])
     {
-        if (frame.getValue("channel_name") == channel_name)
+        if (frame.getValue("user") == user)
         {
             reports.push_back(frame);
             if (frame.getValue("active") == "true")

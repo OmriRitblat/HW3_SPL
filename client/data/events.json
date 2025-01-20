@@ -1,0 +1,15 @@
+{
+    "channel_name": "police",
+    "events": [
+        {
+            "event_name": "a",
+            "city": "b",
+            "date_time": "020620000800",
+            "description": "string",
+            "general_information": {
+                "active": true,
+                "forces_arrival_at_scene": false
+            }
+        }
+    ]
+}

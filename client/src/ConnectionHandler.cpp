@@ -17,20 +17,19 @@ ConnectionHandler::~ConnectionHandler() {
 }
 
 bool ConnectionHandler::connect() {
-	std::cout << "Starting connect to "
-	          << host_ << ":" << port_ << std::endl;
-	try {
-		tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // the server endpoint
-		boost::system::error_code error;
-		socket_.connect(endpoint, error);
-		if (error)
-			throw boost::system::system_error(error);
-	}
-	catch (std::exception &e) {
-		std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
-		return false;
-	}
-	return true;
+    std::cout << "Starting connect to " << host_ << ":" << port_ << std::endl;
+    try {
+        tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // Server endpoint
+        boost::system::error_code error;
+        socket_.connect(endpoint, error);
+        if (error)
+            throw boost::system::system_error(error);
+
+    } catch (std::exception &e) {
+        std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
@@ -65,32 +64,30 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 	return true;
 }
 
+
+
 bool ConnectionHandler::getLine(std::string &line) {
-	return getFrameAscii(line, '\n');
+    return getFrameAscii(line, '\0');
 }
 
 bool ConnectionHandler::sendLine(std::string &line) {
-	return sendFrameAscii(line, '\n');
+	return sendFrameAscii(line, '\0');
 }
 
 
 bool ConnectionHandler::getFrameAscii(std::string &frame, char delimiter) {
-	char ch;
-	// Stop when we encounter the null character.
-	// Notice that the null character is not appended to the frame string.
-	try {
-		do {
-			if (!getBytes(&ch, 1)) {
-				return false;
-			}
-			if (ch != '\0')
-				frame.append(1, ch);
-		} while (delimiter != ch);
-	} catch (std::exception &e) {
-		std::cerr << "recv failed2 (Error: " << e.what() << ')' << std::endl;
-		return false;
-	}
-	return true;
+    char ch;
+
+    do {
+        if (!getBytes(&ch, 1)) {
+            // No data available yet, return false to indicate the caller should retry
+            return false;
+        }
+        if (ch != '\0')
+            frame.append(1, ch);
+    } while (delimiter != ch);
+
+    return true;
 }
 
 bool ConnectionHandler::sendFrameAscii(const std::string &frame, char delimiter) {
@@ -112,4 +109,9 @@ void ConnectionHandler::close() {
 	}
 	    bool ConnectionHandler::shouldTerminate(){
 			return protocol.shouldTerminate();
-		}
+	}
+bool ConnectionHandler::hasDataToRead() {
+    boost::asio::socket_base::bytes_readable command(true); // Request bytes available to read
+    socket_.io_control(command); // Query the socket for available data
+    return command.get() > 0; // Returns true if there's data to read
+}

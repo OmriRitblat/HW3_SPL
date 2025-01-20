@@ -19,4 +19,5 @@ public:
     Frame process(std::string msg);
     void handelRecipt(const Frame &);
     bool shouldTerminate();
+    void setTerminate();
 };

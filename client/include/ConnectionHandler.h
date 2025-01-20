@@ -54,5 +54,6 @@ public:
 	Frame process(std::string msg);
 
 	bool shouldTerminate();
+	bool hasDataToRead();
 
 }; //class ConnectionHandler

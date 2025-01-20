@@ -15,7 +15,7 @@ Frame StompProtocol::process(std::string msg)
     {
     case CommandType::ERROR:
         c.display("Error :\n");
-        c.display(serverMessage.getValue("body"));
+        c.display(serverMessage.getValue("message"));
         break;
     case CommandType::MESSAGE:
         return serverMessage;//for updating the hashmap of events
@@ -41,12 +41,18 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
     OutputHandler c;
     switch (f.getType())
     {
-    case CommandType::SUBSCRIBE:
-        c.display("Joined channel" + f.getValue("destination"));
+    case CommandType::SUBSCRIBE:{
+        size_t pos = f.getValue("destination").find_last_of('/');
+        std::string result = (pos != std::string::npos) ? f.getValue("destination").substr(pos + 1) : f.getValue("destination");
+        c.display("Joined channel " + result);
         break;
-    case CommandType::UNSUBSCRIBE:
-        c.display("Exited channel" + f.getValue("destination"));
+    }
+    case CommandType::UNSUBSCRIBE:{
+        size_t pos = f.getValue("destination").find_last_of('/');
+        std::string result = (pos != std::string::npos) ? f.getValue("destination").substr(pos + 1) : f.getValue("destination");
+        c.display("Exited channel " + result);
         break;
+    }
     case CommandType::DISCONNECT:
         terminate = true;
         break;
@@ -54,3 +60,7 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
         break;
     }
 }
+    void StompProtocol::setTerminate(){
+        terminate=true;
+    }
+
