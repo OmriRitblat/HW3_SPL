@@ -1,8 +1,9 @@
-package bgu.spl.net.Frames;
+package bgu.spl.net.Frames.Res;
 
+import bgu.spl.net.Frames.Req.RequestFrame;
 import bgu.spl.net.srv.ConnectionImp;
 
-public class Message extends Frame {
+public class Message extends ResponseFrame {
     private String channelName;
     private String user;
     private String city;
@@ -11,11 +12,12 @@ public class Message extends Frame {
     private String active;
     private String forces;
     private String description;
+    private int msgId;
 
     public Message(String msg){
-        super(-1);
+        super("MESSAGE");
         String[] lines = msg.split("\n");
-        int recipt=-1;
+        this.msgId=-1;
         boolean isDesciption=false;
         StringBuilder descrip = new StringBuilder();
         for(int i=0;i<lines.length;i++){
@@ -29,7 +31,9 @@ public class Message extends Frame {
             }else{
                 if(key=="user")
                     user = value;
-                else if(key=="city")
+                else if (key=="destination") {
+                    channelName=value;
+                } else if(key=="city")
                     city = value;
                 else if(key=="event name")
                     eventName = value;
@@ -45,12 +49,7 @@ public class Message extends Frame {
             }
         }
         this.description = descrip.toString();
-        this.setRecipet(recipt);
-
     }
 
 
-    @Override
-    public void process(int id, ConnectionImp c) {
-    }
 }

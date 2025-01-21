@@ -1,18 +1,11 @@
 package bgu.spl.net.Frames;
 
-import bgu.spl.net.srv.ConnectionImp;
+import java.io.Serializable;
 
-public abstract class Frame {
-    private int reciept;
+public abstract class Frame implements Serializable {
+    private String type;
 
-    public Frame(int reciept) {
-        this.reciept = reciept;
+    public Frame(String type) {
+        this.type = type;
     }
-
-    public abstract void process(int id, ConnectionImp c);
-
-    public void setRecipet(int reciept) {
-        this.reciept = reciept;
-    }
-
 }

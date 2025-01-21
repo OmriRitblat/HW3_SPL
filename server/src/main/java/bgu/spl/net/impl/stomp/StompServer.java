@@ -1,5 +1,7 @@
 package bgu.spl.net.impl.stomp;
 
+import bgu.spl.net.srv.MessageEncoderDecoderImpl;
+import bgu.spl.net.srv.Reactor;
 import bgu.spl.net.srv.Server;
 import bgu.spl.net.srv.StompMessagingProtocolImpl;
 
@@ -33,8 +35,8 @@ public class StompServer {
         if (serverType.equals("tpc")) {
             server =Server.threadPerClient(
                 port,
-                () -> new StompMessagingProtocolImpl(),
-                () -> new MessageEncoderDecoderImpl()
+                    StompMessagingProtocolImpl::new,
+                    MessageEncoderDecoderImpl::new
             );
             server.serve();
         }

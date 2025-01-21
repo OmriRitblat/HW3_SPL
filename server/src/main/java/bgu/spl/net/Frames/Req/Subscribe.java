@@ -1,17 +1,17 @@
-package bgu.spl.net.Frames;
+package bgu.spl.net.Frames.Req;
 
 import bgu.spl.net.srv.ConnectionImp;
 
-public class Unsubscribe extends Frame {
+public class Subscribe extends RequestFrame {
     private String channelName;
 
 
-    public Unsubscribe(String msg) {
+    public Subscribe(String msg) {
         super(-1);
     }
 
     @Override
     public void process(int id, ConnectionImp c) {
-        c.removeSubscribtion(channelName,id);
+        c.addSubscribtion(channelName,id);
     }
 }

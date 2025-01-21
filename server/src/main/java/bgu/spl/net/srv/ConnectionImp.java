@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionImp<T> {
     private ConcurrentHashMap<Integer, ConnectionHandler> clients; //<connction id, connection handler>
     private ConcurrentHashMap<String, List<Integer>> subsribtion; //<channel name, list<connection id>>
+    private ConcurrentHashMap<Integer, Boolean> login; //<connection id, is logged in>
 
     public boolean send(int connectionId, T msg){
         ConnectionHandler c=clients.get(connectionId);
@@ -26,16 +27,22 @@ public class ConnectionImp<T> {
 
     public void disconnect(int connectionId){
         clients.remove(connectionId);
-        //should remove from subscibtion also?
+        subsribtion.forEach((key, list) -> {
+            synchronized (list) { // Synchronize to avoid concurrent modification
+                list.removeIf(id -> id == connectionId);
+            }
+        });
+        login.computeIfPresent(connectionId, (key, value) -> false);
     }
 
     public void addConnect(int connectionId,ConnectionHandler ch){
         clients.put(connectionId,ch);
+        login.put(connectionId,true);
     }
 
     public void addSubscribtion(String channel,int subId){
-        if(!subsribtion.containsKey(channel))
-            subsribtion.put(channel,new ArrayList<>());
+        if (!subsribtion.containsKey(channel))
+            subsribtion.put(channel, new ArrayList<>());
         subsribtion.get(channel).add(subId);
     }
 
@@ -49,6 +56,9 @@ public class ConnectionImp<T> {
             }
         }
             return  isRemoved;
+    }
+    public boolean isLoggedIn(int connectionId){
+        return login.get(connectionId);
     }
     
 }
