@@ -24,6 +24,7 @@ class Frame
 private:
     CommandType type;
     std::unordered_map<std::string, std::string> data;
+    std::string body;
     int receipt;
     std::string toStringVal;
 
@@ -38,4 +39,6 @@ public:
     std::string typeToString(CommandType s);
     int getRecipt() const;
     void setValueAt(const std::string&,const std::string&);
+    std::string getBody();
+    std::string getValueFromBody(std::string s) const;
 };

@@ -14,12 +14,14 @@ void Frame::setValueAt(const std::string& field,const std::string& value){
 
 void Frame::parseStringToHashMap(const std::string &inputString)
 {
-    std::istringstream stream(inputString);
+    size_t delimiterPos = inputString.find("\n\n");
+    std::string values = inputString.substr(0, delimiterPos);
+    body = inputString.substr(delimiterPos + 2);
+    std::istringstream ValuesStream(values);
     std::string type;
     std::string line;
-
     // Extract the first line
-    if (std::getline(stream, type))
+    if (std::getline(ValuesStream, type))
     {
         if (type == "ERROR")
             this->type = ERROR;
@@ -42,9 +44,9 @@ void Frame::parseStringToHashMap(const std::string &inputString)
         else
             this->type = RECEIPT;
     }
-
+    
     // Loop through the remaining lines
-    while (std::getline(stream, line))
+    while (std::getline(ValuesStream, line))
     {
         if (!line.empty())
         {
@@ -60,20 +62,10 @@ void Frame::parseStringToHashMap(const std::string &inputString)
         }
         else
         {
-            std::string remainingContent;
-            data["body"] = "";
-            while (std::getline(stream, remainingContent))
-            {
-                if (!remainingContent.empty())
-                {
-                    data["body"] += " " + remainingContent;
-                }
-            }
-
             break;
         }
     }
-}
+    }
 
 const std::string &Frame::getValue(const std::string &key) const
 {
@@ -89,13 +81,16 @@ const CommandType &Frame::getType() const
     data.insert({key, val}); 
     receipt = value; 
 }
-    std::string& Frame::toString(){
-        toStringVal=typeToString(type)+"\n";
-        for (const auto& [key, value] : data) {
-        toStringVal+=""+key+":"+""+value+"\n";
+std::string& Frame::toString() {
+    // Start with the type
+    toStringVal = typeToString(type) + "\n";
+    for (const auto& [key, value] : data) {
+            toStringVal += key + ":" + value + "\n";
     }
+        toStringVal+="\n" + body;
+    std::cout << "Generated Frame:\n" << toStringVal << std::endl;
     return toStringVal;
-    }
+}
     std::string Frame::typeToString(CommandType s) {
     switch (s) {
         case CommandType::ERROR:   return "ERROR";
@@ -112,4 +107,22 @@ const CommandType &Frame::getType() const
 }
 int Frame::getRecipt() const{
         return receipt;
+    }
+    std::string Frame::getBody(){
+        return body;
+    }
+    std::string Frame::getValueFromBody(const std::string s) const{
+    std::string key = s+":";
+    if(s=="Description")
+        key+="\n";
+    size_t keyPos = body.find(key);
+    if (keyPos != std::string::npos) {
+        size_t valueStart = keyPos + key.length();
+        size_t valueEnd = body.find('\n', valueStart);
+        if (valueEnd == std::string::npos) {
+            valueEnd = body.length(); 
+        }
+        return body.substr(valueStart, valueEnd - valueStart);
+    }
+    return "";
     }

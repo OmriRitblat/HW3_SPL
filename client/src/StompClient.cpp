@@ -1,37 +1,21 @@
-#include "../include/ConnectionHandler.h"
-#include "../include/OutputHandler.h"
-#include "../include/DataHandler.h"
-#include "../include/keyboardInput.h"
-#include "../include/ThreadSafeQueue.h"
-#include "../include/ThreadSafeHashMap_future.h"
-#include "../include/StompProtocol.h"
-#include "../include/Frame.h"
-#include <thread>
-#include <iostream>
-#include <list>
-#include <string>
+#include "../include/StompClient.h"
 
+StompClient::StompClient(){
+    inputHandler=new keyboardInput(eventQueue);
+}
 int main(int argc, char *argv[])
 {
-    OutputHandler c;
-    ThreadSafeHashMap_future sendMessages; // map of recip id and the frame
-    std::unordered_map<std::string, std::list<Frame>> server_data; //<chanel name ,all frames send to this chanel>
-    std::unordered_map<std::string, std::string> channelNumber;    //<channel name,subscibtion id>
-    int channelSubCount = 0;
-    ThreadSafeQueue eventQueue;
-    keyboardInput inputHandler(eventQueue);
-    int receipt = 0;
-    ConnectionHandler* connectionHandler;
-    std::thread inputThread(&keyboardInput::run, &inputHandler); // run input from user thread
+    StompClient* client=new StompClient();
+    std::thread inputThread(&keyboardInput::run, client->inputHandler); // run input from user thread
     while (1)
     {
-        Frame frame = eventQueue.dequeue();
+        Frame frame = client->eventQueue.dequeue();
         if(frame.getType()==CommandType::CONNECT){
             size_t pos = frame.getValue("host").find(':');
             std::string host = frame.getValue("host").substr(0, pos);
             short port = std::stoi(frame.getValue("host").substr(pos + 1));
-            connectionHandler =new ConnectionHandler(host, port, sendMessages);
-            if (!(*connectionHandler).connect())
+            client->connectionHandler =new ConnectionHandler(host, port, client->sendMessages);
+            if (!(*client->connectionHandler).connect())
             {
                 std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
                 return 1;
@@ -40,44 +24,58 @@ int main(int argc, char *argv[])
         }
         if (frame.getType() == CommandType::SUMMARY)
         {
-            DataHandler data(server_data);
+            if(client->connectionHandler->hasDataToRead())
+                client->getDataFromServer();
+            DataHandler data(client->server_data);
             std::string user = frame.getValue("user");
             std::string channel = frame.getValue("channel_name");
             std::string file = frame.getValue("file");
-            c.printToFile(data.getSummary(user, channel), file);
+            client->c.printToFile(data.getSummary(user, channel), file);
         }
         else
         {
             if (frame.getType() == CommandType::SUBSCRIBE)
             {
-                channelNumber[frame.getValue("destination")] = std::to_string(channelSubCount);
-                frame.setValueAt("id",std::to_string(channelSubCount));
-                channelSubCount++;
+                client->channelNumber[frame.getValue("destination")] = std::to_string(client->channelSubCount);
+                frame.setValueAt("id",std::to_string(client->channelSubCount));
+                client->channelSubCount++;
             }
             if (frame.getType() == CommandType::UNSUBSCRIBE)
             {
-                frame.setValueAt("id", channelNumber[frame.getValue("id")]);
-                auto it = channelNumber.find("key2");
+                frame.setValueAt("id", client->channelNumber[frame.getValue("id")]);
+                auto it = client->channelNumber.find("key2");
 
-                if (it != channelNumber.end())
+                if (it != client->channelNumber.end())
                 {
-                    channelNumber.erase(it);
+                    client->channelNumber.erase(it);
                 }
             }
-            receipt++;
-            frame.addReceipt("receipt", receipt);
-            sendMessages.put(receipt, frame);
+            client->receipt++;
+            frame.addReceipt("receipt", client->receipt);
+            client->sendMessages.put(client->receipt, frame);
             std::cout << frame.toString() << std::endl;
-            if (!(*connectionHandler).sendLine(frame.toString()))
+            if (!(*client->connectionHandler).sendLine(frame.toString()))
             {
                 std::cout << "Disconnected. Exiting...\n"
                           << std::endl;
                 break;
             }
-            std::string answer;
+            client->getDataFromServer();
+            if ((*client->connectionHandler).shouldTerminate())
+            {
+                std::cout << "Exiting...\n"
+                          << std::endl;
+                break;
+            }
+        }
+    }
+    delete(client);
+    return 0;
+}
+void StompClient::getDataFromServer(){
+    std::string answer;
             // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
             // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
-           
             do{
                 (*connectionHandler).getLine(answer);
                     // std::cout << answer << std::endl;
@@ -90,13 +88,9 @@ int main(int argc, char *argv[])
                     server_data[res.getValue("destination")].push_back(res);
                 answer="";
             } while (connectionHandler->hasDataToRead());
-            if ((*connectionHandler).shouldTerminate())
-            {
-                std::cout << "Exiting...\n"
-                          << std::endl;
-                break;
-            }
-        }
-    }
-    return 0;
 }
+StompClient::~StompClient(){
+    delete(inputHandler);
+    delete(connectionHandler);
+}
+
