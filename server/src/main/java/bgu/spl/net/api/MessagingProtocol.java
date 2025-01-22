@@ -2,7 +2,7 @@ package bgu.spl.net.api;
 
 import bgu.spl.net.srv.Connections;
 
-public interface MessagingProtocol<T> extends MessagingProtocol<T> {
+public interface MessagingProtocol<T> {
     
     void start(int connectionId, Connections<T> connections);
     /**
