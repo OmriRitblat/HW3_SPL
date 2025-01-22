@@ -115,3 +115,6 @@ bool ConnectionHandler::hasDataToRead() {
     socket_.io_control(command); // Query the socket for available data
     return command.get() > 0; // Returns true if there's data to read
 }
+bool ConnectionHandler::getLogedIn(){
+	return protocol.getLogedIn();
+}

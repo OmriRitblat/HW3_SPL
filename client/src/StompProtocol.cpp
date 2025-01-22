@@ -6,7 +6,7 @@
 #include <list>
 #include <unordered_map>
 #include "../include/OutputHandler.h"
-StompProtocol::StompProtocol(ThreadSafeHashMap_future& f) :recieptMap(f),terminate(false){}
+StompProtocol::StompProtocol(ThreadSafeHashMap_future& f) :recieptMap(f),terminate(false),logedIn(false){}
 Frame StompProtocol::process(std::string msg)
 {
     Frame serverMessage(msg);
@@ -22,6 +22,7 @@ Frame StompProtocol::process(std::string msg)
         break;
     case CommandType::CONNECTED:
         c.display("Login succcessful");
+        logedIn=true;
         break;
     case CommandType::RECEIPT:
         handelRecipt(serverMessage);
@@ -62,5 +63,8 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
 }
     void StompProtocol::setTerminate(){
         terminate=true;
+    }
+    bool StompProtocol::getLogedIn(){
+        return logedIn;
     }
 
