@@ -16,6 +16,7 @@ using boost::asio::ip::tcp;
 
 class StompClient {
 public:
+    bool logedIn;
 	OutputHandler c;
     ThreadSafeHashMap_future sendMessages; // map of recip id and the frame
     std::unordered_map<std::string, std::list<Frame>> server_data; //<chanel name ,all frames send to this chanel>

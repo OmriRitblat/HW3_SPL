@@ -55,5 +55,6 @@ public:
 
 	bool shouldTerminate();
 	bool hasDataToRead();
+	bool getLogedIn();
 
 }; //class ConnectionHandler

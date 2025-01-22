@@ -51,8 +51,6 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
 bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 	int tmp = 0;
 	boost::system::error_code error;
-	std::cout << "Sending to server (" << bytesToWrite << " bytes): " 
-              << std::string(bytes, bytesToWrite) << std::endl;
 	try {
 		while (!error && bytesToWrite > tmp) {
 			tmp += socket_.write_some(boost::asio::buffer(bytes + tmp, bytesToWrite - tmp), error);
@@ -116,4 +114,7 @@ bool ConnectionHandler::hasDataToRead() {
     boost::asio::socket_base::bytes_readable command(true); // Request bytes available to read
     socket_.io_control(command); // Query the socket for available data
     return command.get() > 0; // Returns true if there's data to read
+}
+bool ConnectionHandler::getLogedIn(){
+	return protocol.getLogedIn();
 }

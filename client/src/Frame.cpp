@@ -16,7 +16,8 @@ void Frame::parseStringToHashMap(const std::string &inputString)
 {
     size_t delimiterPos = inputString.find("\n\n");
     std::string values = inputString.substr(0, delimiterPos);
-    body = inputString.substr(delimiterPos + 2);
+    if (delimiterPos + 2 < inputString.size()) 
+        body = inputString.substr(delimiterPos + 2);
     std::istringstream ValuesStream(values);
     std::string type;
     std::string line;
@@ -43,6 +44,9 @@ void Frame::parseStringToHashMap(const std::string &inputString)
             this->type = DISCONNECT;
         else
             this->type = RECEIPT;
+    }
+    else{
+        this->type = Null;
     }
     
     // Loop through the remaining lines

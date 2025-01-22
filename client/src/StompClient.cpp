@@ -1,7 +1,9 @@
 #include "../include/StompClient.h"
 
 StompClient::StompClient(){
+    connectionHandler=nullptr;
     inputHandler=new keyboardInput(eventQueue);
+    logedIn=false;
 }
 int main(int argc, char *argv[])
 {
@@ -11,6 +13,10 @@ int main(int argc, char *argv[])
     {
         Frame frame = client->eventQueue.dequeue();
         if(frame.getType()==CommandType::CONNECT){
+            if(client->connectionHandler!=nullptr&&client->connectionHandler->getLogedIn()){
+                client->c.display("you allready loged in");
+                break;
+            }
             size_t pos = frame.getValue("host").find(':');
             std::string host = frame.getValue("host").substr(0, pos);
             short port = std::stoi(frame.getValue("host").substr(pos + 1));
@@ -42,9 +48,8 @@ int main(int argc, char *argv[])
             }
             if (frame.getType() == CommandType::UNSUBSCRIBE)
             {
+                auto it = client->channelNumber.find(frame.getValue("id"));
                 frame.setValueAt("id", client->channelNumber[frame.getValue("id")]);
-                auto it = client->channelNumber.find("key2");
-
                 if (it != client->channelNumber.end())
                 {
                     client->channelNumber.erase(it);
@@ -79,7 +84,6 @@ void StompClient::getDataFromServer(){
             do{
                 (*connectionHandler).getLine(answer);
                     // std::cout << answer << std::endl;
-                int len = answer.length();
                 // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
                 // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
                 Frame answerFrame(answer);
