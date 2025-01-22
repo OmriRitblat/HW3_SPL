@@ -1,5 +1,10 @@
 package bgu.spl.net.impl.stomp;
 
+import bgu.spl.net.srv.MessageEncoderDecoderImpl;
+import bgu.spl.net.srv.Reactor;
+import bgu.spl.net.srv.Server;
+import bgu.spl.net.srv.StompMessagingProtocolImpl;
+
 public class StompServer {
 
     public static void main(String[] args) {
@@ -12,7 +17,7 @@ public class StompServer {
         String serverType;
 
         try {
-            port = Integer.parseInt(args);
+            port = Integer.parseInt(args[0]);
             serverType = args[1].toLowerCase();
 
         } catch (NumberFormatException e) {
@@ -30,18 +35,19 @@ public class StompServer {
         if (serverType.equals("tpc")) {
             server =Server.threadPerClient(
                 port,
-                () -> new StompMessagingProtocolImpl(),
-                () -> new MessageEncoderDecoderImpl()
+                    StompMessagingProtocolImpl::new,
+                    MessageEncoderDecoderImpl::new
             );
+            server.serve();
         }
         else if(serverType.equals("reactor")){
             server = Server.reactor(
-                10,
-                port,
-                () -> new StompMessagingProtocolImpl(),
-                () -> new MessageEncoderDecoderImpl()
+                    Runtime.getRuntime().availableProcessors(),
+                    port,
+                    () -> new StompMessagingProtocolImpl(),
+                    () -> new MessageEncoderDecoderImpl()
             );
+            server.serve();
         }
-        server.serve();
     }
 }
