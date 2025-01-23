@@ -13,6 +13,7 @@ class StompProtocol
 private:
     ThreadSafeHashMap_future &recieptMap;
     bool terminate;
+    bool logedIn;
 
 public:
     StompProtocol(ThreadSafeHashMap_future&);
@@ -20,4 +21,5 @@ public:
     void handelRecipt(const Frame &);
     bool shouldTerminate();
     void setTerminate();
+    bool getLogedIn();
 };

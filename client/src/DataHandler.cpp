@@ -14,12 +14,13 @@ std::string DataHandler::getSummary(const std::string &user, const std::string &
     std::list<Frame> reports;
     for (const auto &frame : serverMessages[channel_name])
     {
-        if (frame.getValue("user") == user)
+        std::string user1 =frame.getValueFromBody("user");
+        if (user1 == user)
         {
             reports.push_back(frame);
-            if (frame.getValue("active") == "true")
+            if (frame.getValueFromBody("active") == "true")
                 activeCount++;
-            if (frame.getValue("forces_arrival_at_scene") == "true")
+            if (frame.getValueFromBody("forces_arrival_at_scene") == "true")
                 forceCount++;
         }
     }
@@ -33,10 +34,10 @@ std::string DataHandler::getSummary(const std::string &user, const std::string &
     {
         reportCount++;
         summary << "Report_" << reportCount << ":\n"
-                << "\t" << "city: " << frame.getValue("city") << "\n"
-                << "\t" << "date time: " << formatDateTime(frame.getValue("date_time")) << "\n"
-                << "\t" << "event name: " << frame.getValue("event_name") << "\n"
-                << "\t" << "description: " << formatSummary(frame.getValue("description")) << "\n";
+                << "\t" << "city: " << frame.getValueFromBody("city") << "\n"
+                << "\t" << "date time: " << frame.getValueFromBody("date time") << "\n"
+                << "\t" << "event name: " << frame.getValueFromBody("event name") << "\n"
+                << "\t" << "description: " << formatSummary(frame.getValueFromBody("Description")) << "\n";
     }
     return summary.str();
 }

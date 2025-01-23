@@ -1,5 +1,8 @@
 package bgu.spl.net.Frames.Req;
 
+import bgu.spl.net.Frames.Res.Error;
+import bgu.spl.net.Frames.Res.Message;
+import bgu.spl.net.Frames.Res.ResponseFrame;
 import bgu.spl.net.srv.ConnectionImp;
 
 public class Send extends RequestFrame {
@@ -7,7 +10,7 @@ public class Send extends RequestFrame {
     private String body;
 
     public Send(String msg) {
-        super(-1);
+        super(-1,msg);
         String[] lines = msg.split("\n");
         int receipt = -1;
         boolean isDesciption = false;
@@ -31,6 +34,15 @@ public class Send extends RequestFrame {
 
     @Override
     public void process(int id, ConnectionImp c) {
+        ResponseFrame f;
+        if(!c.isSubscribe(id,channelName)){
+            f=new Error("user not subscribe to the channel or the cannel does not exist", getMessage(), "user not subscribe to the channel or the cannel does not exist", getReciept());
+            c.send(id,f);
+        }
+        else{
+            f=new Message(body);
+            c.send(channelName, f);
+        }
         
     }
 }

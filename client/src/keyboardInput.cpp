@@ -76,7 +76,7 @@ void keyboardInput::createEvent(const std::string &e)
         else
         {
              frame << "SUMMARY\n"
-                  << "channel_name:"<<arg1<<"\n"
+                  << "channel_name:/"<<arg1<<"\n"
                   << "user:"<<arg2<<"\n"
                   << "file:"<<arg3<<"\n";
             Frame f(frame.str());
@@ -114,7 +114,7 @@ void keyboardInput::createEvent(const std::string &e)
             names_and_events allEvents = parseEventsFile(arg1);
             for (size_t i = 0; i < allEvents.events.size(); ++i)
             {
-                frame.clear();
+                std::ostringstream frame;
                 const Event &event = allEvents.events[i];
                 frame << "SEND" << "\n"
                       << "destination:/" << allEvents.channel_name << "\n\n"

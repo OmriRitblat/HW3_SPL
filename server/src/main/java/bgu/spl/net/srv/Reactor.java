@@ -108,8 +108,10 @@ public class Reactor<T> implements Server<T> {
                 this,
                 idCounter);
         clientChan.register(selector, SelectionKey.OP_READ, handler);
-        con.addConnect(idCounter,handler);
         idCounter++;
+        System.out.println("id couter in reactor "+idCounter);
+        con.addConnect(idCounter,handler);
+        
     }
 
     private void handleReadWrite(SelectionKey key) {
