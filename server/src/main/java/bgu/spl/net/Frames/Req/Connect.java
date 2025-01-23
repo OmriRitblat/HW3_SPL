@@ -43,6 +43,7 @@ public class Connect extends RequestFrame {
         else if(version!="1.2")
             f=new Error("the version does not match the latest version, should be 1.2",this.getMessage(),"version does not match",this.getReciept());
         else{
+            c.login(id);
             f=new Connected(version);
             c.send(id,f);
             f=new Reciept(getReciept());
