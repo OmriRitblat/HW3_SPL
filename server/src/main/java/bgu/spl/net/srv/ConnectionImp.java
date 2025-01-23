@@ -1,5 +1,6 @@
 package bgu.spl.net.srv;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +41,12 @@ public class ConnectionImp<T> {
             }
         });
         login.computeIfPresent(connectionId, (key, value) -> false);
+        try {
+            clients.get(connectionId).close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        clients.remove(connectionId);
     }
 
     public void addConnect(int connectionId,ConnectionHandler ch){

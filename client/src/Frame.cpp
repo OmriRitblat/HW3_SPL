@@ -92,7 +92,6 @@ std::string& Frame::toString() {
             toStringVal += key + ":" + value + "\n";
     }
         toStringVal+="\n" + body;
-    std::cout << "Generated Frame:\n" << toStringVal << std::endl;
     return toStringVal;
 }
     std::string Frame::typeToString(CommandType s) {

@@ -16,10 +16,11 @@ private:
     bool logedIn;
 
 public:
-    StompProtocol(ThreadSafeHashMap_future&);
+    StompProtocol(ThreadSafeHashMap_future &);
     Frame process(std::string msg);
     void handelRecipt(const Frame &);
     bool shouldTerminate();
     void setTerminate();
     bool getLogedIn();
+    bool setLogedIn(bool logedin);
 };

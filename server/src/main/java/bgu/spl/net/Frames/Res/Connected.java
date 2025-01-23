@@ -6,4 +6,8 @@ public class Connected extends ResponseFrame {
         super("CONNECTED");
         this.version = version;
     }
+
+    public String toString(){
+        return "CONNECTED/n version:" + version;
+    }
 }

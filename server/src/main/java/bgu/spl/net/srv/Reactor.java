@@ -143,6 +143,7 @@ public class Reactor<T> implements Server<T> {
 
     public void handleDisconnect(int id){
         con.disconnect(id);
+        //here is where we need to close the socket for client+id
     }
 
 }

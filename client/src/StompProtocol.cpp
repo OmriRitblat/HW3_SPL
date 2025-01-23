@@ -6,7 +6,7 @@
 #include <list>
 #include <unordered_map>
 #include "../include/OutputHandler.h"
-StompProtocol::StompProtocol(ThreadSafeHashMap_future& f) :recieptMap(f),terminate(false),logedIn(false){}
+StompProtocol::StompProtocol(ThreadSafeHashMap_future &f) : recieptMap(f), terminate(false), logedIn(false) {}
 Frame StompProtocol::process(std::string msg)
 {
     Frame serverMessage(msg);
@@ -16,13 +16,14 @@ Frame StompProtocol::process(std::string msg)
     case CommandType::ERROR:
         c.display("Error :\n");
         c.display(serverMessage.getValue("message"));
+        terminate = true;
         break;
     case CommandType::MESSAGE:
-        return serverMessage;//for updating the hashmap of events
+        return serverMessage; // for updating the hashmap of events
         break;
     case CommandType::CONNECTED:
         c.display("Login succcessful");
-        logedIn=true;
+        logedIn = true;
         break;
     case CommandType::RECEIPT:
         handelRecipt(serverMessage);
@@ -42,13 +43,15 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
     OutputHandler c;
     switch (f.getType())
     {
-    case CommandType::SUBSCRIBE:{
+    case CommandType::SUBSCRIBE:
+    {
         size_t pos = f.getValue("destination").find_last_of('/');
         std::string result = (pos != std::string::npos) ? f.getValue("destination").substr(pos + 1) : f.getValue("destination");
         c.display("Joined channel " + result);
         break;
     }
-    case CommandType::UNSUBSCRIBE:{
+    case CommandType::UNSUBSCRIBE:
+    {
         size_t pos = f.getValue("destination").find_last_of('/');
         std::string result = (pos != std::string::npos) ? f.getValue("destination").substr(pos + 1) : f.getValue("destination");
         c.display("Exited channel " + result);
@@ -61,10 +64,11 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
         break;
     }
 }
-    void StompProtocol::setTerminate(){
-        terminate=true;
-    }
-    bool StompProtocol::getLogedIn(){
-        return logedIn;
-    }
-
+void StompProtocol::setTerminate()
+{
+    terminate = true;
+}
+bool StompProtocol::getLogedIn()
+{
+    return logedIn;
+}

@@ -1,36 +1,40 @@
 #include "../include/StompClient.h"
 
-StompClient::StompClient(){
-    connectionHandler=nullptr;
-    inputHandler=new keyboardInput(eventQueue);
-    logedIn=false;
+StompClient::StompClient()
+{
+    connectionHandler = nullptr;
+    inputHandler = new keyboardInput(eventQueue);
+    logedIn = false;
 }
 int main(int argc, char *argv[])
 {
-    StompClient* client=new StompClient();
+    StompClient *client = new StompClient();
     std::thread inputThread(&keyboardInput::run, client->inputHandler); // run input from user thread
     while (1)
     {
         Frame frame = client->eventQueue.dequeue();
-        if(frame.getType()==CommandType::CONNECT){
-            if(client->connectionHandler!=nullptr&&client->connectionHandler->getLogedIn()){
-                client->c.display("you allready loged in");
+        if (frame.getType() == CommandType::CONNECT)
+        {
+            if (client->connectionHandler != nullptr && client->connectionHandler->getLogedIn())
+            {
+                client->c.display("user allready loged in");
                 break;
             }
             size_t pos = frame.getValue("host").find(':');
             std::string host = frame.getValue("host").substr(0, pos);
             short port = std::stoi(frame.getValue("host").substr(pos + 1));
-            client->connectionHandler =new ConnectionHandler(host, port, client->sendMessages);
+            if (client->connectionHandler == nullptr)
+                client->connectionHandler = new ConnectionHandler(host, port, client->sendMessages);
             if (!(*client->connectionHandler).connect())
             {
                 std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
                 return 1;
             }
-            frame.setValueAt("host","stomp.cs.bgu.ac.il");
+            frame.setValueAt("host", "stomp.cs.bgu.ac.il");
         }
         if (frame.getType() == CommandType::SUMMARY)
         {
-            if(client->connectionHandler->hasDataToRead())
+            if (client->connectionHandler->hasDataToRead())
                 client->getDataFromServer();
             DataHandler data(client->server_data);
             std::string user = frame.getValue("user");
@@ -43,7 +47,7 @@ int main(int argc, char *argv[])
             if (frame.getType() == CommandType::SUBSCRIBE)
             {
                 client->channelNumber[frame.getValue("destination")] = std::to_string(client->channelSubCount);
-                frame.setValueAt("id",std::to_string(client->channelSubCount));
+                frame.setValueAt("id", std::to_string(client->channelSubCount));
                 client->channelSubCount++;
             }
             if (frame.getType() == CommandType::UNSUBSCRIBE)
@@ -70,31 +74,34 @@ int main(int argc, char *argv[])
             {
                 std::cout << "Exiting...\n"
                           << std::endl;
-                break;
+                delete (client->ConnectionHandler);
+                client->ConnectionHandler = nullptr;
             }
         }
     }
-    delete(client);
+    delete (client);
     return 0;
 }
-void StompClient::getDataFromServer(){
+void StompClient::getDataFromServer()
+{
     std::string answer;
-            // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
-            // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
-            do{
-                (*connectionHandler).getLine(answer);
-                    // std::cout << answer << std::endl;
-                // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
-                // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
-                Frame answerFrame(answer);
-                Frame res = (*connectionHandler).process(answer);
-                if (answerFrame.getType() == CommandType::MESSAGE)
-                    server_data[res.getValue("destination")].push_back(res);
-                answer="";
-            } while (connectionHandler->hasDataToRead());
+    // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
+    // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
+    do
+    {
+        (*connectionHandler).getLine(answer);
+        // std::cout << answer << std::endl;
+        // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
+        // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
+        Frame answerFrame(answer);
+        Frame res = (*connectionHandler).process(answer);
+        if (answerFrame.getType() == CommandType::MESSAGE)
+            server_data[res.getValue("destination")].push_back(res);
+        answer = "";
+    } while (connectionHandler->hasDataToRead());
 }
-StompClient::~StompClient(){
-    delete(inputHandler);
-    delete(connectionHandler);
+StompClient::~StompClient()
+{
+    delete (inputHandler);
+    delete (connectionHandler);
 }
-

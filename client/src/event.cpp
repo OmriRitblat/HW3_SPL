@@ -129,7 +129,6 @@ names_and_events parseEventsFile(std::string json_path)
 {
     char buffer[PATH_MAX];
     if (getcwd(buffer, sizeof(buffer)) != nullptr) {
-        std::cout << "Current working directory: " << buffer << std::endl;
     } else {
         perror("getcwd");
     }
