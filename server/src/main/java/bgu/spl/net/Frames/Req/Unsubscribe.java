@@ -5,8 +5,7 @@ import bgu.spl.net.Frames.Res.ResponseFrame;
 import bgu.spl.net.srv.ConnectionImp;
 
 public class Unsubscribe extends RequestFrame {
-    private String channelName;
-    private int id;
+    private int channelId;
 
 
     public Unsubscribe(String msg) {
@@ -20,10 +19,8 @@ public class Unsubscribe extends RequestFrame {
             String value = msg.substring(colonIndex + 1);
             if(key=="recipt")
                 recipt = Integer.parseInt(value);
-            else if(key=="destination")
-                channelName = value;
             else if(key=="id")
-                id = Integer.parseInt(value);
+                channelId = Integer.parseInt(value);
         }
         this.setRecipet(recipt);
     }
@@ -33,10 +30,10 @@ public class Unsubscribe extends RequestFrame {
         ResponseFrame f;
         if(!c.isLoggedIn(id))
             f=new bgu.spl.net.Frames.Res.Error("user not loged in so can not unsubscribe to channels", this.getMessage(), "user not loged in so can not unsubscribe to channels", id);
-        else if(!c.isSubscribe(id, channelName))
+        else if(!c.isSubscribe(id, channelId))
             f=new bgu.spl.net.Frames.Res.Error("user is not subscribe to this channel or channel does not exist so can not unsubscribe", this.getMessage(), "user is not subscribe to this channel so can not unsubscribe", id);
         else{
-            c.removeSubscribtion(channelName,id);
+            c.removeSubscribtion(channelId,id);
             f=new Reciept(id);
         }
         c.send(id, f);

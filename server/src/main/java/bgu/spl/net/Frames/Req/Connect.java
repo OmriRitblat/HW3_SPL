@@ -41,8 +41,10 @@ public class Connect extends RequestFrame {
             f=new Error("User already logged in or password is not match",this.getMessage(),"User already logged in",this.getReciept());
         else if(version!="1.2")
             f=new Error("the version does not match the latest version, should be 1.2",this.getMessage(),"version does not match",this.getReciept());
-        else
+        else{
+            c.login(id);
             f=new Connected(version);
+        }
         c.send(id,f);
     }
 }
