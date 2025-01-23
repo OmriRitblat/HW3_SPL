@@ -6,10 +6,12 @@
     "configurations": [
         {
             "type": "java",
-            "name": "EchoServer",
+            "name": "StompServer",
             "request": "launch",
-            "mainClass": "bgu.spl.net.impl.echo.EchoServer",
-            "projectName": "server"
+            "mainClass": "bgu.spl.net.impl.stomp.StompServer",
+            "args": ["7777","tpc"],
+            "projectName": "server",
+            "preLaunchTask": "mvn compile"
         },
         {
             "name": "(gdb) Launch stomp client",

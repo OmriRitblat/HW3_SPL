@@ -43,6 +43,5 @@ public class Send extends RequestFrame {
             f=new Message(body);
             c.send(channelName, f);
         }
-        
     }
 }

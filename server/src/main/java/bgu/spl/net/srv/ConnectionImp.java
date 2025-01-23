@@ -28,9 +28,12 @@ public class ConnectionImp<T> {
 
     public void send(String channel, T msg){
         List<Integer> sub=subsribtion.get(channel);
+        synchronized(sub){
         if(sub!=null)
             for(Integer i:sub)
                 send(i,msg);
+        notifyAll();
+        }
     }
 
     public void disconnect(int connectionId){
@@ -38,6 +41,7 @@ public class ConnectionImp<T> {
         subsribtion.forEach((key, list) -> {
             synchronized (list) { // Synchronize to avoid concurrent modification
                 list.removeIf(id -> id == connectionId);
+                notifyAll();
             }
         });
         login.computeIfPresent(connectionId, (key, value) -> false);

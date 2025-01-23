@@ -2,6 +2,7 @@ package bgu.spl.net.Frames.Req;
 
 import bgu.spl.net.Frames.Res.Connected;
 import bgu.spl.net.Frames.Res.Error;
+import bgu.spl.net.Frames.Res.Reciept;
 import bgu.spl.net.Frames.Res.ResponseFrame;
 import bgu.spl.net.srv.ConnectionImp;
 
@@ -38,11 +39,15 @@ public class Connect extends RequestFrame {
     public void process(int id, ConnectionImp c) {
         ResponseFrame f;
         if(c.isLoggedIn(id) || !c.isCorrectPassword(id,password))
-            f=new Error("User already logged in or password is not match",this.getMessage(),"User already logged in",this.getReciept());
+            f=new Error("User already logged in or password is not match",this.getMessage(),"User already logged in or password is not match",this.getReciept());
         else if(version!="1.2")
             f=new Error("the version does not match the latest version, should be 1.2",this.getMessage(),"version does not match",this.getReciept());
-        else
+        else{
             f=new Connected(version);
+            c.send(id,f);
+            f=new Reciept(getReciept());
+        }
         c.send(id,f);
+
     }
 }

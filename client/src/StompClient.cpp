@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
             {
                 std::cout << "Exiting...\n"
                           << std::endl;
-                delete (client->ConnectionHandler);
-                client->ConnectionHandler = nullptr;
+                delete (client->connectionHandler);
+                client->connectionHandler = nullptr;
             }
         }
     }

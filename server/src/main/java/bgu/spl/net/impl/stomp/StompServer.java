@@ -36,7 +36,7 @@ public class StompServer {
             server =Server.threadPerClient(
                 port,
                     StompMessagingProtocolImpl::new,
-                    MessageEncoderDecoderImpl::new
+                    StompEncoderDecoder::new
             );
             server.serve();
         }
@@ -45,7 +45,7 @@ public class StompServer {
                     Runtime.getRuntime().availableProcessors(),
                     port,
                     () -> new StompMessagingProtocolImpl(),
-                    () -> new MessageEncoderDecoderImpl()
+                    () -> new StompEncoderDecoder()
             );
             server.serve();
         }

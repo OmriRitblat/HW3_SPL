@@ -17,12 +17,15 @@ public class Disconnect extends RequestFrame {
     @Override
     public void process(int id, ConnectionImp c) {
         ResponseFrame f;
-        if(!c.isLoggedIn(id))
+        if(!c.isLoggedIn(id)){
             f=new Error("user not loged in so can not be disconnected", this.getMessage(), "user not loged in so can not be disconnected", id);
-        else{
-            c.disconnect(id);
-            f=new Reciept(getReciept());
+            c.send(id, f);
         }
-        c.send(id, f);
+        else{
+            f=new Reciept(getReciept());
+            c.send(id, f);
+            c.disconnect(id);
+        }
+        
     }
 }
