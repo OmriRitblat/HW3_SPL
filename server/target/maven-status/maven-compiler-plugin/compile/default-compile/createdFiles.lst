@@ -32,6 +32,7 @@ bgu/spl/net/srv/ActorThreadPool.class
 bgu/spl/net/Frames/Res/Reciept.class
 bgu/spl/net/impl/rci/ObjectEncoderDecoder.class
 bgu/spl/net/srv/Reactor.class
+bgu/spl/net/impl/rci/ObjectEncoderDecoder.class
 bgu/spl/net/Frames/Req/Subscribe.class
 bgu/spl/net/impl/newsfeed/FetchNewsCommand.class
 bgu/spl/net/Frames/Req/RequestFrame.class
