@@ -17,15 +17,17 @@ public class Disconnect extends RequestFrame {
     @Override
     public void process(int id, ConnectionImp c) {
         ResponseFrame f;
-        if(!c.isLoggedIn(id)){
+        if (this.getReciept() == -1){
+            f=new Error("part of the data is missing, please send {reciept-id} in order to DISCONNECT", this.getMessage(),"the frame missing data",this.getReciept());
+        }
+        else if(!c.isLoggedIn(id)){
             f=new Error("user not loged in so can not be disconnected", this.getMessage(), "user not loged in so can not be disconnected", id);
-            c.send(id, f);
         }
         else{
             f=new Reciept(getReciept());
-            c.send(id, f);
-            c.disconnect(id);
         }
+        c.send(id, f);
+        c.disconnect(id);
         
     }
 }

@@ -41,7 +41,7 @@ public class Connect extends RequestFrame {
     public void process(int id, ConnectionImp c) {
         ResponseFrame f;
         if(this.isMissingData())
-            f=new Error("part of the data is missing, please send {version, host, user, password} in order to connect", this.getMessage(),"the frame missing data",this.getReciept());
+            f=new Error("part of the data is missing, please send {version, host, user, password} in order to CONNECT", this.getMessage(),"the frame missing data",this.getReciept());
         else if(c.isLoggedIn(id) || !c.isCorrectPassword(id,password))
             f=new Error("User already logged in or password is not match",this.getMessage(),"User already logged in or password is not match",this.getReciept());
         else if(version!="1.2")
@@ -49,10 +49,14 @@ public class Connect extends RequestFrame {
         else{
             c.login(id);
             f=new Connected(version);
-            c.send(id,f);
-            f=new Reciept(getReciept());
+            if(this.getReciept()!=-1) {
+                c.send(id, f);
+                f = new Reciept(getReciept());
+            }
         }
         c.send(id,f);
+        if(f.getClass().equals(Error.class))
+            c.disconnect(id);
 
     }
 }

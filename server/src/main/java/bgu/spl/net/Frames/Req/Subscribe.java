@@ -37,9 +37,9 @@ public class Subscribe extends RequestFrame {
 
     @Override
     public void process(int id, ConnectionImp c) {
-        ResponseFrame f;
+        ResponseFrame f=null;
         if(this.isMissingData())
-            f=new Error("part of the data is missing, please send {destination, id} in order to connect", this.getMessage(),"the frame missing data",this.getReciept());
+            f=new Error("part of the data is missing, please send {destination, id} in order to subscribe", this.getMessage(),"the frame missing data",this.getReciept());
         else if(!c.isLoggedIn(id))
             f=new bgu.spl.net.Frames.Res.Error("user not loged in so can not subscribe to channels", this.getMessage(), "user not loged in so can not subscribe to channels", id);
         else if(c.isSubscribe(id, channelName))
@@ -48,6 +48,9 @@ public class Subscribe extends RequestFrame {
             c.addSubscribtion(channelName,id,channelId);
             f=new Reciept(id);
         }
-        c.send(id, f);
+        if(f!=null)
+            c.send(id, f);
+        if(f!=null && f.getClass().equals(Error.class))
+            c.disconnect(id);
     }
 }

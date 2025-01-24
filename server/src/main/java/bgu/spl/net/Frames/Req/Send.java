@@ -38,8 +38,10 @@ public class Send extends RequestFrame {
     @Override
     public void process(int id, ConnectionImp c) {
         ResponseFrame f;
-        if(this.isMissingData())
-            f=new Error("part of the data is missing, please send {destination, send body} in order to connect", this.getMessage(),"the frame missing data",this.getReciept());
+        if (this.isMissingData()){
+            f = new Error("part of the data is missing, please send {destination, send body} in order to SEND", this.getMessage(), "the frame missing data", this.getReciept());
+            c.send(id, f);
+        }
         else if(!c.isSubscribe(id,channelName)){
             f=new Error("user not subscribe to the channel or the cannel does not exist", getMessage(), "user not subscribe to the channel or the cannel does not exist", getReciept());
             c.send(id,f);
@@ -48,5 +50,7 @@ public class Send extends RequestFrame {
             f=new Message(body);
             c.send(channelName, f);
         }
+        if(f.getClass().equals(Error.class))
+            c.disconnect(id);
     }
 }
