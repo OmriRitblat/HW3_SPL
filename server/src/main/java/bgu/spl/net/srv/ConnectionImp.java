@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ConnectionImp<T> {
+public class ConnectionImp<T> implements Connections<T>{
     private ConcurrentHashMap<Integer, ConnectionHandler> clients; //<connction id, connection handler>
     private ConcurrentHashMap<String, List<Integer>> subsribtion; //<channel name, list<connection id>>
     private ConcurrentHashMap<Integer, ConcurrentHashMap<Integer,String>> channelsId; // <connection id, <channel id, channel name>>
@@ -94,7 +94,7 @@ public class ConnectionImp<T> {
     }
 
     public boolean isCorrectPassword(int id, String password){
-        if(login.get(id)!=null){
+        if(login.get(id)==null){
             idData.put(id,password);
             return true;
         }else

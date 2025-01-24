@@ -6,31 +6,12 @@ import bgu.spl.net.Frames.Res.ResponseFrame;
 import bgu.spl.net.srv.ConnectionImp;
 
 public class Send extends RequestFrame {
-    private String channelName;
-    private String body;
-
     public Send(String msg) {
-        super(-1,msg);
+        super(-1,msg,"Send");
         String[] lines = msg.split("\n");
         int receipt = -1;
-        boolean isDesciption = false;
-        StringBuilder descrip = new StringBuilder();
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i] != "\n") {
-                int colonIndex = lines[i].indexOf(":");
-                String key = lines[i].substring(0, colonIndex);
-                // Extract the value (after the colon)
-                String value = lines[i].substring(colonIndex + 1);
-                if (isDesciption) {
-                    descrip.append(value);
-                } else if (key == "destination")
-                    channelName = value;
-            } else
-                isDesciption = true;
-        }
-        this.body = descrip.toString();
         setRecipet(receipt);
-        if(channelName == null || body == null){
+        if(super.getHeaderByKey("destination").equals("") || body == null){
             this.setMissingData(true);
         }
     }
@@ -42,13 +23,13 @@ public class Send extends RequestFrame {
             f = new Error("part of the data is missing, please send {destination, send body} in order to SEND", this.getMessage(), "the frame missing data", this.getReciept());
             c.send(id, f);
         }
-        else if(!c.isSubscribe(id,channelName)){
+        else if(!c.isSubscribe(id,super.getHeaderByKey("destination"))){
             f=new Error("user not subscribe to the channel or the cannel does not exist", getMessage(), "user not subscribe to the channel or the cannel does not exist", getReciept());
             c.send(id,f);
         }
         else{
             f=new Message(body);
-            c.send(channelName, f);
+            c.send(super.getHeaderByKey("destination"), f);
         }
         if(f.getClass().equals(Error.class))
             c.disconnect(id);

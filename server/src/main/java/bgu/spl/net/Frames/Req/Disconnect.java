@@ -8,10 +8,8 @@ import bgu.spl.net.srv.ConnectionImp;
 
 public class Disconnect extends RequestFrame {
     public Disconnect(String msg) {
-        super(-1,msg);
-        String[] lines = msg.split("\n");
-        int colonIndex = msg.indexOf(":");
-        setRecipet(Integer.parseInt(msg.substring(colonIndex + 1)));
+        super(-1,msg,"Disconnect");
+        setRecipet(Integer.parseInt(super.getHeaderByKey("receipt")));
     }
 
     @Override

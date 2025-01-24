@@ -18,11 +18,12 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     private BufferedOutputStream out;
     private volatile boolean connected = true;
 
-    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, StompMessagingProtocol<T> protocol) {
+    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, StompMessagingProtocol<T> protocol,int idCounter, ConnectionImp con) {
         this.sock = sock;
         this.encdec = reader;
         this.protocol = protocol;
-    }
+        protocol.start(idCounter, con);
+    } 
 
     @Override
     public void run() {

@@ -16,8 +16,11 @@ void Frame::parseStringToHashMap(const std::string &inputString)
 {
     size_t delimiterPos = inputString.find("\n\n");
     std::string values = inputString.substr(0, delimiterPos);
-    if (delimiterPos + 2 < inputString.size()) 
-        body = inputString.substr(delimiterPos + 2);
+    if (delimiterPos != std::string::npos && delimiterPos + 2 < inputString.size()) {
+    body = inputString.substr(delimiterPos + 2);
+    } else {
+    body = "";
+    }
     std::istringstream ValuesStream(values);
     std::string type;
     std::string line;

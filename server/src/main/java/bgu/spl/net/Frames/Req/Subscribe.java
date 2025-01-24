@@ -11,28 +11,22 @@ public class Subscribe extends RequestFrame {
 
 
     public Subscribe(String msg) {
-        super(-1,msg);
+        super(-1,msg,"Subscribe");
         String[] lines = msg.split("\n");
         int recipt=-1;
         boolean isIdFound=false;
-        for(String line : lines){
-            int colonIndex = msg.indexOf(":");
-            String key = msg.substring(0, colonIndex).trim();
-            // Extract the value (after the colon)
-            String value = msg.substring(colonIndex + 1);
-            if(key=="recipt")
-                recipt = Integer.parseInt(value);
-            else if(key=="destination")
-                channelName = value;
-            else if(key=="id") {
+        recipt = Integer.parseInt(super.getHeaderByKey("recipt"));
+        channelName = super.getHeaderByKey("destination");
+        if(!super.getHeaderByKey("id").equals("")) {
                 isIdFound = true;
-                channelId = Integer.parseInt(value);
-            }
+                channelId = Integer.parseInt(super.getHeaderByKey("id"));
+        }
+        else{
+            isIdFound = false;
         }
         this.setRecipet(recipt);
         if(channelName==null || !isIdFound)
             this.setMissingData(true);
-
     }
 
     @Override
