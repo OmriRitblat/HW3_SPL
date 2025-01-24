@@ -30,15 +30,19 @@ public class Connect extends RequestFrame {
             else if(key=="password")
                 password = value;
             else if(key=="accept-version")
-            password = value;
+                version = value;
         }
         this.setRecipet(recipt);
+        if(version==null || host==null|| user==null|| password==null)
+            setMissingData(true);
     }
 
     @Override
     public void process(int id, ConnectionImp c) {
         ResponseFrame f;
-        if(c.isLoggedIn(id) || !c.isCorrectPassword(id,password))
+        if(this.isMissingData())
+            f=new Error("part of the data is missing, please send {version, host, user, password} in order to connect", this.getMessage(),"the frame missing data",this.getReciept());
+        else if(c.isLoggedIn(id) || !c.isCorrectPassword(id,password))
             f=new Error("User already logged in or password is not match",this.getMessage(),"User already logged in or password is not match",this.getReciept());
         else if(version!="1.2")
             f=new Error("the version does not match the latest version, should be 1.2",this.getMessage(),"version does not match",this.getReciept());

@@ -30,12 +30,17 @@ public class Send extends RequestFrame {
         }
         this.body = descrip.toString();
         setRecipet(receipt);
+        if(channelName == null || body == null){
+            this.setMissingData(true);
+        }
     }
 
     @Override
     public void process(int id, ConnectionImp c) {
         ResponseFrame f;
-        if(!c.isSubscribe(id,channelName)){
+        if(this.isMissingData())
+            f=new Error("part of the data is missing, please send {destination, send body} in order to connect", this.getMessage(),"the frame missing data",this.getReciept());
+        else if(!c.isSubscribe(id,channelName)){
             f=new Error("user not subscribe to the channel or the cannel does not exist", getMessage(), "user not subscribe to the channel or the cannel does not exist", getReciept());
             c.send(id,f);
         }
