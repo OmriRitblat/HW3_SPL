@@ -1,14 +1,16 @@
 package bgu.spl.net.Frames.Res;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Reciept extends ResponseFrame {
     private int recieptId;
 
-    public Reciept(int recieptId, String type) {
-        super(type);
+    public Reciept(String type, ConcurrentHashMap<String, String> headers, String body) {
+        super(type,headers, body);
         this.recieptId = recieptId;
     }
     public Reciept(int recieptId) {
-        super("RECIEPT");
+        super("RECEIPT", ResponseFrame.getData("RECEIPT/n receipt-id :" + recieptId),ResponseFrame.getBody("CONNECTED/n version:" + recieptId));
         this.recieptId = recieptId;
     }
 }

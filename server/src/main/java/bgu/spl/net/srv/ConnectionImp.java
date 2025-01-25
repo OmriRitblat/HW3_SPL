@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ConnectionImp<T> implements Connections<T>{
@@ -12,6 +13,7 @@ public class ConnectionImp<T> implements Connections<T>{
     private ConcurrentHashMap<Integer, ConcurrentHashMap<Integer,String>> channelsId; // <connection id, <channel id, channel name>>
     private ConcurrentHashMap<Integer, Boolean> login; //<connection id, is logged in>
     private ConcurrentHashMap<Integer,String> idData;//<connection id, password>
+    private AtomicInteger messageCount;
 
     public ConnectionImp(){
         this.clients=new ConcurrentHashMap<>();
@@ -19,6 +21,7 @@ public class ConnectionImp<T> implements Connections<T>{
         this.subsribtion=new ConcurrentHashMap<>();
         this.idData=new ConcurrentHashMap<>();
         this.channelsId=new ConcurrentHashMap<>();
+        this.messageCount=new AtomicInteger(0);
     }
     public boolean send(int connectionId, T msg){
         ConnectionHandler c=clients.get(connectionId);
@@ -33,14 +36,14 @@ public class ConnectionImp<T> implements Connections<T>{
         List<Integer> sub=subsribtion.get(channel);
         synchronized(sub){
         if(sub!=null)
-            for(Integer i:sub)
-                send(i,msg);
+            for(Integer i:sub) {
+                send(i, msg);
+            }
         notifyAll();
         }
     }
 
     public void disconnect(int connectionId){
-        clients.remove(connectionId);
         subsribtion.forEach((key, list) -> {
             synchronized (list) { // Synchronize to avoid concurrent modification
                 list.removeIf(id -> id == connectionId);
@@ -48,12 +51,28 @@ public class ConnectionImp<T> implements Connections<T>{
             }
         });
         login.computeIfPresent(connectionId, (key, value) -> false);
-        try {
-            clients.get(connectionId).close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(clients.get(connectionId)!=null){
+            try {
+                clients.get(connectionId).close();
+                clients.remove(connectionId);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        clients.remove(connectionId);
+    }
+
+    public int getMessageCount() {
+        return messageCount.addAndGet(1);
+    }
+
+    public List<Integer> getSubsribtion(String channel){
+        return subsribtion.get(channel);
+    }
+
+    public Integer getChannelId(String channel,int connectionId){
+        if(channelsId.containsKey(connectionId))
+            return findKeyByValue(channelsId.get(connectionId), channel);
+        return null;
     }
 
     public void addConnect(int connectionId,ConnectionHandler ch){
@@ -75,9 +94,9 @@ public class ConnectionImp<T> implements Connections<T>{
         boolean isRemoved=false;
         if(channelsId.containsKey(subId)){
             if(channelsId.get(subId).containsKey(channelId)) {
-                String channelName = channelsId.get(channelId).get(subId);
-                channelsId.get(subId).remove(channelName);
-                if(!subsribtion.containsKey(channelName)){
+                String channelName = channelsId.get(subId).get(channelId);
+                channelsId.get(subId).remove(channelId);
+                if(subsribtion.containsKey(channelName)){
                     List<Integer> sub=subsribtion.get(channelName);
                     if (sub.contains(subId)) {
                         sub.remove(subId);
@@ -98,7 +117,7 @@ public class ConnectionImp<T> implements Connections<T>{
             idData.put(id,password);
             return true;
         }else
-            return login.get(id).equals(password);
+            return idData.get(id).equals(password);
     }
 
     public void login(int connectionId){
@@ -130,12 +149,15 @@ public class ConnectionImp<T> implements Connections<T>{
     }
 
     private Integer findKeyByValue(ConcurrentHashMap<Integer, String> map, String valueReq) {
-        AtomicReference<Integer> keyForValueReq = new AtomicReference<>();
+        AtomicInteger keyForValueReq = new AtomicInteger(-1);
         map.forEach((key, value) -> {
             if (value.equals(valueReq)) {
-                keyForValueReq.set(key);
+                keyForValueReq.updateAndGet(v -> key);
             }
         });
+        if(keyForValueReq.get()!=-1){
+            return keyForValueReq.get();
+        }
         return null;
     }
     

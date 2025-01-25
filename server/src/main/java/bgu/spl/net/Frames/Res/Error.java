@@ -4,13 +4,11 @@ import bgu.spl.net.Frames.Req.RequestFrame;
 
 public class Error extends Reciept {
     private String msg;
-    private RequestFrame frame;
     private String details;
 
     public Error(String msg, String frameMsg, String details,int receipt) {
-        super(receipt,"ERROR");
+        super("ERROR", ResponseFrame.getData("ERROR/n receipt-id :" + receipt+"\n The message:\n ----\n"+msg+"\n ----\n"+details),ResponseFrame.getBody("ERROR/n receipt-id :" + receipt+"\n The message:\n ----\n"+msg+"\n ----\n"+details));
         this.msg = msg;
-        this.frame = frame;
         this.details = details;
     }
 }

@@ -41,7 +41,7 @@ public class Unsubscribe extends RequestFrame {
                 f=new Reciept(id);
         }
         if(f!=null)
-            c.send(id, f);
+            c.send(id, f.toString());
         if(f!=null && f.getClass().equals(Error.class))
             c.disconnect(id);
     }

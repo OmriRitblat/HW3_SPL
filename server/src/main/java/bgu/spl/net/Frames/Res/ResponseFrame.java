@@ -10,4 +10,8 @@ public abstract class ResponseFrame extends Frame {
     public ResponseFrame(String type, ConcurrentHashMap<String, String> headers, String body) {
         super(type,headers,body);
     }
+
+    public void addHeader(String key, String value) {
+        this.headers.put(key, value);
+    }
 }

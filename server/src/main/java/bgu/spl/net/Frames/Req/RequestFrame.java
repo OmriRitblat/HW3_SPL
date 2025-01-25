@@ -25,39 +25,7 @@ public abstract class RequestFrame extends Frame{
     public void setRecipet(int reciept) {
         this.reciept = reciept;
     }
-    public static ConcurrentHashMap<String, String> getData(String msg) {
-        int delimiterPos = msg.indexOf("\n\n");
-        String values = (delimiterPos != -1) ? msg.substring(0, delimiterPos) : "";
-        // Parse the values
-        Scanner valuesStream = new Scanner(values);
-        if (valuesStream.hasNextLine()) {//get ride of the type line
-            String typeLine = valuesStream.nextLine();
-        }
-        ConcurrentHashMap<String, String> data=new ConcurrentHashMap<>();
-        // Parse key-value pairs from the remaining lines
-        while (valuesStream.hasNextLine()) {
-            String line = valuesStream.nextLine();
-            if (!line.isEmpty()) {
-                int pos = line.indexOf(':');
-                if (pos != -1) {
-                    String key = line.substring(0, pos).trim();
-                    String value = line.substring(pos + 1).trim();
-                        data.put(key, value);
-                    }
-            } else {
-                break;
-            }
-        }
-        valuesStream.close();
-        return data;
-    }
-    public static String getBody(String msg){
-        int delimiterPos = msg.indexOf("\n\n");
-        String values = (delimiterPos != -1) ? msg.substring(0, delimiterPos) : "";
-        return (delimiterPos != -1 && delimiterPos + 2 < msg.length())
-                ? msg.substring(delimiterPos + 2)
-                : "";
-    }
+
     public int getReciept() {
         return reciept;
     }

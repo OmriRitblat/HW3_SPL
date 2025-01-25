@@ -24,7 +24,7 @@ public class Disconnect extends RequestFrame {
         else{
             f=new Reciept(getReciept());
         }
-        c.send(id, f);
+        c.send(id, f.toString());
         c.disconnect(id);
         
     }

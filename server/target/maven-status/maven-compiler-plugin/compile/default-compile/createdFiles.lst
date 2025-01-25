@@ -1,6 +1,7 @@
+bgu/spl/net/srv/ConnectionImp.class
+bgu/spl/net/srv/ConnectionHandler.class
+bgu/spl/net/impl/stomp/StompEncoderDecoder.class
 bgu/spl/net/api/MessageEncoderDecoder.class
 bgu/spl/net/srv/Connections.class
 bgu/spl/net/Frames/Frame.class
-bgu/spl/net/srv/ConnectionImp.class
-bgu/spl/net/srv/ConnectionHandler.class
 bgu/spl/net/Frames/Req/RequestFrame.class

@@ -5,6 +5,8 @@ import bgu.spl.net.Frames.Res.Reciept;
 import bgu.spl.net.Frames.Res.ResponseFrame;
 import bgu.spl.net.srv.ConnectionImp;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Subscribe extends RequestFrame {
     private String channelName;
     private int channelId;
@@ -13,17 +15,18 @@ public class Subscribe extends RequestFrame {
     public Subscribe(String msg) {
         super(-1,msg,"Subscribe");
         String[] lines = msg.split("\n");
-        int recipt=-1;
         boolean isIdFound=false;
-        recipt = Integer.parseInt(super.getHeaderByKey("recipt"));
-        channelName = super.getHeaderByKey("destination");
-        if(!super.getHeaderByKey("id").equals("")) {
-                isIdFound = true;
-                channelId = Integer.parseInt(super.getHeaderByKey("id"));
+        int recipt=-1;
+        ConcurrentHashMap<String,String> data = super.getHeaders();
+        if(data.containsKey("receipt"))
+            recipt = Integer.parseInt(data.get("receipt"));
+        if(data.containsKey("id")) {
+            channelId = Integer.parseInt(data.get("id"));
+            isIdFound = true;
         }
-        else{
-            isIdFound = false;
-        }
+
+        if(data.containsKey("destination"))
+            channelName = data.get("destination");
         this.setRecipet(recipt);
         if(channelName==null || !isIdFound)
             this.setMissingData(true);
@@ -40,10 +43,11 @@ public class Subscribe extends RequestFrame {
             f=new bgu.spl.net.Frames.Res.Error("user already subscribe to this channel", this.getMessage(), "user already subscribe to this channel", id);
         else{
             c.addSubscribtion(channelName,id,channelId);
-            f=new Reciept(id);
+            if(this.getReciept()!=-1)
+                f=new Reciept(this.getReciept());
         }
         if(f!=null)
-            c.send(id, f);
+            c.send(id, f.toString());
         if(f!=null && f.getClass().equals(Error.class))
             c.disconnect(id);
     }
