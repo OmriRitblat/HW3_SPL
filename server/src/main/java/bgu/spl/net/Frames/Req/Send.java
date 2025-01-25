@@ -38,7 +38,7 @@ public class Send extends RequestFrame {
             List<Integer> subToChan=c.getSubsribtion(destination);
             for(Integer i:subToChan){
                 ConcurrentHashMap<String, String> headers=new ConcurrentHashMap<>();
-                headers.put("destination",destination);
+                headers.put("destination",this.getHeaderByKey("destination"));
                 headers.put("subscription",String.valueOf(c.getChannelId(destination,i)));
                 headers.put("message-id",String.valueOf(c.getMessageCount()));
                 f=new Message(body,headers);
