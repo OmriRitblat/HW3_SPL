@@ -24,5 +24,5 @@ public:
     void setTerminate();
     bool getLogedIn();
     bool setLogedIn(bool logedin);
-    std::string findKeyByValue(const std::unordered_map<std::string, std::string>& myMap, const std::string& valueToFind);
+    std::string findKeyByValue(std::unordered_map<std::string, std::string>* myMap, std::string& valueToFind);
 };

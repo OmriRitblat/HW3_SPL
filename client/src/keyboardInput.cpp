@@ -9,22 +9,94 @@
 #include <unordered_map>
 #include "../include/Frame.h"
 
-keyboardInput::keyboardInput(ThreadSafeQueue &q) : eventsFromUser(q), userName("") {}
-
-void keyboardInput::run()
-{
+keyboardInput::keyboardInput(std::unordered_map<std::string, std::list<Frame>> *server_data,
+                  ThreadSafeHashMap_future *sendMessages,
+                  OutputHandler *c)
+        : userName(""), server_data(server_data), sendMessages(sendMessages), c(c) { 
+           channelNumber=new std::unordered_map<std::string, std::string>();
+           connectionHandler=nullptr; 
+        }
+void keyboardInput::run(){
+    std::unique_lock<std::mutex> lock(mutex_);
+    int receipt=0;
+    int channelSubCount=0;
     while (1)
     {
         const short bufsize = 1024;
         char buf[bufsize];
         std::cin.getline(buf, bufsize);
         std::string input(buf);
-        createEvent(input);
+        std::list<Frame> frames=createEvent(input);
+        if (frames.front().getType() == CommandType::CONNECT)
+        {
+            if (connectionHandler != nullptr && connectionHandler->getLogedIn())
+            {
+                (*c).display("Client allready loged in");
+                break;
+            }
+            size_t pos = frames.front().getValue("host").find(':');
+            std::string host = frames.front().getValue("host").substr(0, pos);
+            short port = std::stoi(frames.front().getValue("host").substr(pos + 1));
+            if (connectionHandler == nullptr){
+                connectionHandler = new ConnectionHandler(host, port, (*sendMessages),channelNumber);
+            }
+            if (!(*connectionHandler).connect())
+            {
+                std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
+                break;
+            }
+            lock.unlock();
+            frames.front().setValueAt("host", "stomp.cs.bgu.ac.il");
+        }
+        if (frames.front().getType() == CommandType::SUMMARY)
+        {
+            DataHandler data((*server_data));
+            std::string user = frames.front().getValue("user");
+            std::string channel = frames.front().getValue("channel_name").substr(1);
+            std::string file = frames.front().getValue("file");
+            if((*channelNumber)[channel]!="")
+                (*c).printToFile(data.getSummary(user, channel), file);
+        }
+        else
+        {
+            if (frames.front().getType() == CommandType::SUBSCRIBE)
+            {
+                (*channelNumber)[frames.front().getValue("destination")] = std::to_string(channelSubCount);
+                std::cout << (*channelNumber)[frames.front().getValue("destination")]
+                          << std::endl;
+                std::cout << channelNumber->size()
+                          << std::endl;
+                frames.front().setValueAt("id", std::to_string(channelSubCount));
+                channelSubCount++;
+            }
+            if (frames.front().getType() == CommandType::UNSUBSCRIBE)
+            {
+                auto it = (*channelNumber).find(frames.front().getValue("id"));
+                frames.front().setValueAt("id", ""+(*channelNumber)[frames.front().getValue("id")]);
+                if (it != (*channelNumber).end())
+                {
+                    (*channelNumber).erase(it);
+                }
+            }
+            for (Frame& frame : frames) {
+            receipt++;
+            frame.addReceipt("receipt",receipt);
+            (*sendMessages).put(receipt, frame);
+            std::cout << frame.toString() << std::endl;
+            if (!(*connectionHandler).sendLine(frame.toString()))
+            {
+                std::cout << "Disconnected. Exiting...\n"
+                          << std::endl;
+                break;
+            }
+        }
+        }
     }
 }
 
-void keyboardInput::createEvent(const std::string &e)
+std::list<Frame> keyboardInput::createEvent(const std::string &e)
 {
+    std::list<Frame> l;
     OutputHandler c;
     std::istringstream input(e);
     std::string command, arg1, arg2, arg3, endMsg;
@@ -47,7 +119,7 @@ void keyboardInput::createEvent(const std::string &e)
                   << "passcode:" << arg3 << "\n";
             userName = arg2;
             Frame f(frame.str());
-            sendFrame(f);
+            l.push_back(f);
         }
     }
     else if (command == "join")
@@ -63,7 +135,7 @@ void keyboardInput::createEvent(const std::string &e)
                   << "destination:" << arg1 << "\n"
                   << "id:-";
             Frame f(frame.str());
-            sendFrame(f);
+            l.push_back(f);
         }
     }
     else if (command == "summary")
@@ -80,7 +152,7 @@ void keyboardInput::createEvent(const std::string &e)
                   << "user:"<<arg2<<"\n"
                   << "file:"<<arg3<<"\n";
             Frame f(frame.str());
-            sendFrame(f);
+            l.push_back(f);
         }
     }
     else if (command == "exit")
@@ -95,7 +167,7 @@ void keyboardInput::createEvent(const std::string &e)
             frame << "UNSUBSCRIBE\n"
                   <<"id:"<<arg1<<"\n";
             Frame f(frame.str());
-            sendFrame(f);
+            l.push_back(f);
         }
     }
     else if (command == "report")
@@ -128,7 +200,7 @@ void keyboardInput::createEvent(const std::string &e)
                       << "Description:" << "\n"
                       << event.get_description() << "\n";
                 Frame f(frame.str());
-                sendFrame(f);
+            l.push_back(f);
             }
         }
     }
@@ -141,19 +213,16 @@ void keyboardInput::createEvent(const std::string &e)
         {
             frame << "DISCONNECT\n";
             Frame f(frame.str());
-            sendFrame(f);
+            l.push_back(f);
         }
     }
     else
     {
         c.display("invalid command, you can use the commands: login, join, exit, report and logout");
     }
+    return l;
 }
-void keyboardInput::sendFrame(Frame &frame)
-{
-    try {
-        eventsFromUser.enqueue(frame);        // Enqueue the frame string
-    } catch (const std::exception &e) {
-        std::cerr << "Error in sendFrame: " << e.what() << std::endl;
-    }
+ConnectionHandler* keyboardInput::getConnectionHendler(){
+    std::unique_lock<std::mutex> lock(mutex_);
+    return connectionHandler;
 }
