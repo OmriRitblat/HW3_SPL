@@ -8,8 +8,8 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-ConnectionHandler::ConnectionHandler(string host, short port,ThreadSafeHashMap_future& f) : host_(host), port_(port), io_service_(),
-                                                                socket_(io_service_), protocol(f){
+ConnectionHandler::ConnectionHandler(string host, short port,ThreadSafeHashMap_future& f, std::unordered_map<std::string, std::string>* channelNumber) : host_(host), port_(port), io_service_(),
+                                                                socket_(io_service_), protocol(f,channelNumber){
 																}
 
 ConnectionHandler::~ConnectionHandler() {

@@ -14,13 +14,15 @@ private:
     ThreadSafeHashMap_future &recieptMap;
     bool terminate;
     bool logedIn;
+    std::unordered_map<std::string, std::string>* channelNumber;
 
 public:
-    StompProtocol(ThreadSafeHashMap_future &);
+    StompProtocol(ThreadSafeHashMap_future & f, std::unordered_map<std::string, std::string>* channelNumber);
     Frame process(std::string msg);
     void handelRecipt(const Frame &);
     bool shouldTerminate();
     void setTerminate();
     bool getLogedIn();
     bool setLogedIn(bool logedin);
+    std::string findKeyByValue(const std::unordered_map<std::string, std::string>& myMap, const std::string& valueToFind);
 };

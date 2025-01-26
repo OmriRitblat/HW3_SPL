@@ -6,7 +6,7 @@
 #include <list>
 #include <unordered_map>
 #include "../include/OutputHandler.h"
-StompProtocol::StompProtocol(ThreadSafeHashMap_future &f) : recieptMap(f), terminate(false), logedIn(false) {}
+StompProtocol::StompProtocol(ThreadSafeHashMap_future & f, std::unordered_map<std::string, std::string>* channelNumber):recieptMap(f), terminate(false), logedIn(false),channelNumber(channelNumber){}
 Frame StompProtocol::process(std::string msg)
 {
     Frame serverMessage(msg);
@@ -52,9 +52,9 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
     }
     case CommandType::UNSUBSCRIBE:
     {
-        size_t pos = f.getValue("destination").find_last_of('/');
-        std::string result = (pos != std::string::npos) ? f.getValue("destination").substr(pos + 1) : f.getValue("destination");
-        c.display("Exited channel " + result);
+        size_t pos = f.getValue("id").find_last_of('/');
+        std::string result = (pos != std::string::npos) ? f.getValue("id").substr(pos + 1) : f.getValue("id");
+        c.display("Exited channel " + findKeyByValue((*channelNumber),result));
         break;
     }
     case CommandType::DISCONNECT:
@@ -71,4 +71,13 @@ void StompProtocol::setTerminate()
 bool StompProtocol::getLogedIn()
 {
     return logedIn;
+}
+std::string StompProtocol::findKeyByValue(const std::unordered_map<std::string, std::string>& myMap, const std::string& valueToFind) {
+    // Iterate through the unordered_map
+    for (const auto& pair : myMap) {
+        if (pair.second == valueToFind) { // Check if the value matches
+            return pair.first; // Return the key
+        }
+    }
+    return "error"; // Return nullopt if value not found
 }

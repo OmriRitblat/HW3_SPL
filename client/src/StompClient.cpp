@@ -23,8 +23,10 @@ int main(int argc, char *argv[])
             size_t pos = frame.getValue("host").find(':');
             std::string host = frame.getValue("host").substr(0, pos);
             short port = std::stoi(frame.getValue("host").substr(pos + 1));
-            if (client->connectionHandler == nullptr)
-                client->connectionHandler = new ConnectionHandler(host, port, client->sendMessages);
+            if (client->connectionHandler == nullptr){
+                client->channelNumber=new std::unordered_map<std::string, std::string>();
+                client->connectionHandler = new ConnectionHandler(host, port, client->sendMessages,client->channelNumber);
+            }
             if (!(*client->connectionHandler).connect())
             {
                 std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
@@ -46,17 +48,17 @@ int main(int argc, char *argv[])
         {
             if (frame.getType() == CommandType::SUBSCRIBE)
             {
-                client->channelNumber[frame.getValue("destination")] = std::to_string(client->channelSubCount);
+                (*client->channelNumber)[frame.getValue("destination")] = client->channelSubCount+"";
                 frame.setValueAt("id", std::to_string(client->channelSubCount));
                 client->channelSubCount++;
             }
             if (frame.getType() == CommandType::UNSUBSCRIBE)
             {
-                auto it = client->channelNumber.find(frame.getValue("id"));
-                frame.setValueAt("id", client->channelNumber[frame.getValue("id")]);
-                if (it != client->channelNumber.end())
+                auto it = (*client->channelNumber).find(frame.getValue("destination"));
+                frame.setValueAt("id", (*client->channelNumber)[frame.getValue("destination")]);
+                if (it != (*client->channelNumber).end())
                 {
-                    client->channelNumber.erase(it);
+                    (*client->channelNumber).erase(it);
                 }
             }
             client->receipt++;
@@ -102,6 +104,7 @@ void StompClient::getDataFromServer()
 }
 StompClient::~StompClient()
 {
+    delete(channelNumber);
     delete (inputHandler);
     delete (connectionHandler);
 }

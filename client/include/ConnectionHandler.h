@@ -17,7 +17,7 @@ private:
 	StompProtocol protocol;
 
 public:
-	ConnectionHandler(std::string host, short port,ThreadSafeHashMap_future& f);
+	ConnectionHandler(std::string host, short port,ThreadSafeHashMap_future& f,std::unordered_map<std::string, std::string>* channelNumber);
 
 	virtual ~ConnectionHandler();
 
