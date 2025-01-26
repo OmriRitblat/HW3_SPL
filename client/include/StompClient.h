@@ -4,7 +4,6 @@
 #include "../include/OutputHandler.h"
 #include "../include/DataHandler.h"
 #include "../include/keyboardInput.h"
-#include "../include/ThreadSafeQueue.h"
 #include "../include/ThreadSafeHashMap_future.h"
 #include "../include/StompProtocol.h"
 #include "../include/Frame.h"

@@ -4,29 +4,31 @@
 #include <iostream>
 #include "../include/event.h"
 #include "../include/keyboardInput.h"
-#include "../include/ThreadSafeQueue.h"
 #include "../include/OutputHandler.h"
+#include "../include/SynchronizedHashMap.h"
 #include <unordered_map>
 #include "../include/Frame.h"
 
 keyboardInput::keyboardInput(std::unordered_map<std::string, std::list<Frame>> *server_data,
-                  ThreadSafeHashMap_future *sendMessages,
-                  OutputHandler *c)
-        : userName(""), server_data(server_data), sendMessages(sendMessages), c(c) { 
-           channelNumber=new std::unordered_map<std::string, std::string>();
-           connectionHandler=nullptr; 
-        }
-void keyboardInput::run(){
+                             ThreadSafeHashMap_future *sendMessages,
+                             OutputHandler *c)
+    : userName(""), server_data(server_data), sendMessages(sendMessages), c(c)
+{
+    channelNumber = new SynchronizedHashMap();
+    connectionHandler = nullptr;
+}
+void keyboardInput::run()
+{
     std::unique_lock<std::mutex> lock(mutex_);
-    int receipt=0;
-    int channelSubCount=0;
+    int receipt = 0;
+    int channelSubCount = 0;
     while (1)
     {
         const short bufsize = 1024;
         char buf[bufsize];
         std::cin.getline(buf, bufsize);
         std::string input(buf);
-        std::list<Frame> frames=createEvent(input);
+        std::list<Frame> frames = createEvent(input);
         if (frames.front().getType() == CommandType::CONNECT)
         {
             if (connectionHandler != nullptr && connectionHandler->getLogedIn())
@@ -37,8 +39,9 @@ void keyboardInput::run(){
             size_t pos = frames.front().getValue("host").find(':');
             std::string host = frames.front().getValue("host").substr(0, pos);
             short port = std::stoi(frames.front().getValue("host").substr(pos + 1));
-            if (connectionHandler == nullptr){
-                connectionHandler = new ConnectionHandler(host, port, (*sendMessages),channelNumber);
+            if (connectionHandler == nullptr)
+            {
+                connectionHandler = new ConnectionHandler(host, port, (*sendMessages), channelNumber);
             }
             if (!(*connectionHandler).connect())
             {
@@ -54,42 +57,36 @@ void keyboardInput::run(){
             std::string user = frames.front().getValue("user");
             std::string channel = frames.front().getValue("channel_name").substr(1);
             std::string file = frames.front().getValue("file");
-            if((*channelNumber)[channel]!="")
+            if ((*channelNumber).get(channel) != "")
                 (*c).printToFile(data.getSummary(user, channel), file);
         }
         else
         {
             if (frames.front().getType() == CommandType::SUBSCRIBE)
             {
-                (*channelNumber)[frames.front().getValue("destination")] = std::to_string(channelSubCount);
-                std::cout << (*channelNumber)[frames.front().getValue("destination")]
-                          << std::endl;
-                std::cout << channelNumber->size()
-                          << std::endl;
+                (*channelNumber).get(frames.front().getValue("destination")) = std::to_string(channelSubCount);
                 frames.front().setValueAt("id", std::to_string(channelSubCount));
                 channelSubCount++;
             }
             if (frames.front().getType() == CommandType::UNSUBSCRIBE)
             {
-                auto it = (*channelNumber).find(frames.front().getValue("id"));
-                frames.front().setValueAt("id", ""+(*channelNumber)[frames.front().getValue("id")]);
-                if (it != (*channelNumber).end())
+                auto it = (*channelNumber).get(frames.front().getValue("id"));
+                frames.front().setValueAt("id", "" + (*channelNumber).get(frames.front().getValue("id")));
+                (*channelNumber).remove(it);
+            }
+            for (Frame &frame : frames)
+            {
+                receipt++;
+                frame.addReceipt("receipt", receipt);
+                (*sendMessages).put(receipt, frame);
+                std::cout << frame.toString() << std::endl;
+                if (!(*connectionHandler).sendLine(frame.toString()))
                 {
-                    (*channelNumber).erase(it);
+                    std::cout << "Disconnected. Exiting...\n"
+                              << std::endl;
+                    break;
                 }
             }
-            for (Frame& frame : frames) {
-            receipt++;
-            frame.addReceipt("receipt",receipt);
-            (*sendMessages).put(receipt, frame);
-            std::cout << frame.toString() << std::endl;
-            if (!(*connectionHandler).sendLine(frame.toString()))
-            {
-                std::cout << "Disconnected. Exiting...\n"
-                          << std::endl;
-                break;
-            }
-        }
         }
     }
 }
@@ -140,17 +137,17 @@ std::list<Frame> keyboardInput::createEvent(const std::string &e)
     }
     else if (command == "summary")
     {
-        input >> arg1 >>arg2>>arg3>> endMsg; // channel_name, user, file
-        if (arg1 == ""||arg2==""||arg3=="")
+        input >> arg1 >> arg2 >> arg3 >> endMsg; // channel_name, user, file
+        if (arg1 == "" || arg2 == "" || arg3 == "")
             c.display("channel name is missing, you should insert channel name, user and output file");
         else if (endMsg != "")
             c.display("there is unnessery data, you should insert channel name, user and output file");
         else
         {
-             frame << "SUMMARY\n"
-                  << "channel_name:/"<<arg1<<"\n"
-                  << "user:"<<arg2<<"\n"
-                  << "file:"<<arg3<<"\n";
+            frame << "SUMMARY\n"
+                  << "channel_name:/" << arg1 << "\n"
+                  << "user:" << arg2 << "\n"
+                  << "file:" << arg3 << "\n";
             Frame f(frame.str());
             l.push_back(f);
         }
@@ -165,7 +162,7 @@ std::list<Frame> keyboardInput::createEvent(const std::string &e)
         else
         {
             frame << "UNSUBSCRIBE\n"
-                  <<"id:"<<arg1<<"\n";
+                  << "id:" << arg1 << "\n";
             Frame f(frame.str());
             l.push_back(f);
         }
@@ -200,7 +197,7 @@ std::list<Frame> keyboardInput::createEvent(const std::string &e)
                       << "Description:" << "\n"
                       << event.get_description() << "\n";
                 Frame f(frame.str());
-            l.push_back(f);
+                l.push_back(f);
             }
         }
     }
@@ -222,7 +219,8 @@ std::list<Frame> keyboardInput::createEvent(const std::string &e)
     }
     return l;
 }
-ConnectionHandler* keyboardInput::getConnectionHendler(){
+ConnectionHandler *keyboardInput::getConnectionHendler()
+{
     std::unique_lock<std::mutex> lock(mutex_);
     return connectionHandler;
 }

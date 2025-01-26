@@ -4,9 +4,10 @@
 #include "../include/StompProtocol.h"
 #include "../include/Frame.h"
 #include <list>
+#include "../include/SynchronizedHashMap.h"
 #include <unordered_map>
 #include "../include/OutputHandler.h"
-StompProtocol::StompProtocol(ThreadSafeHashMap_future & f, std::unordered_map<std::string, std::string>* channelNumber):recieptMap(f), terminate(false), logedIn(false),channelNumber(channelNumber){}
+StompProtocol::StompProtocol(ThreadSafeHashMap_future &f, SynchronizedHashMap *channelNumber) : recieptMap(f), terminate(false), logedIn(false), channelNumber(channelNumber) {}
 Frame StompProtocol::process(std::string msg)
 {
     Frame serverMessage(msg);
@@ -15,7 +16,7 @@ Frame StompProtocol::process(std::string msg)
     {
     case CommandType::ERROR:
         c.display("Error :\n");
-        c.display(serverMessage.getValue("message"));
+        c.display(serverMessage.getBody());
         terminate = true;
         logedIn = false;
         break;
@@ -55,7 +56,7 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
     {
         size_t pos = f.getValue("id").find_last_of('/');
         std::string result = (pos != std::string::npos) ? f.getValue("id").substr(pos + 1) : f.getValue("id");
-        c.display("Exited channel " + findKeyByValue(channelNumber,result));
+        c.display("Exited channel " + findKeyByValue(channelNumber, result));
         break;
     }
     case CommandType::DISCONNECT:
@@ -73,10 +74,14 @@ bool StompProtocol::getLogedIn()
 {
     return logedIn;
 }
-std::string StompProtocol::findKeyByValue(std::unordered_map<std::string, std::string>* myMap, std::string& valueToFind) {
+std::string StompProtocol::findKeyByValue(SynchronizedHashMap *myMap, std::string &valueToFind)
+{
     // Iterate through the unordered_map
-    for (auto& pair : (*myMap)) {
-        if (pair.second == valueToFind) { // Check if the value matches
+    std::vector<std::pair<std::string, std::string>> s = myMap->getAllPairs();
+    for (auto &pair : myMap->getAllPairs())
+    {
+        if (pair.second == valueToFind)
+        {                      // Check if the value matches
             return pair.first; // Return the key
         }
     }

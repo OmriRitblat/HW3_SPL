@@ -5,19 +5,21 @@
 #include <boost/asio.hpp>
 #include "StompProtocol.h"
 #include "Frame.h"
+#include "SynchronizedHashMap.h"
 
 using boost::asio::ip::tcp;
 
-class ConnectionHandler {
+class ConnectionHandler
+{
 private:
 	const std::string host_;
 	const short port_;
-	boost::asio::io_service io_service_;   // Provides core I/O functionality
+	boost::asio::io_service io_service_; // Provides core I/O functionality
 	tcp::socket socket_;
 	StompProtocol protocol;
 
 public:
-	ConnectionHandler(std::string host, short port,ThreadSafeHashMap_future& f,std::unordered_map<std::string, std::string>* channelNumber);
+	ConnectionHandler(std::string host, short port, ThreadSafeHashMap_future &f, SynchronizedHashMap *channelNumber);
 
 	virtual ~ConnectionHandler();
 
@@ -57,4 +59,4 @@ public:
 	bool hasDataToRead();
 	bool getLogedIn();
 
-}; //class ConnectionHandler
+}; // class ConnectionHandler

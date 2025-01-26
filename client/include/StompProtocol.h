@@ -4,6 +4,7 @@
 #include <string>
 #include "../include/Frame.h"
 #include <list>
+#include "../include/SynchronizedHashMap.h"
 #include <unordered_map>
 #include "../include/ThreadSafeHashMap_future.h"
 
@@ -14,15 +15,15 @@ private:
     ThreadSafeHashMap_future &recieptMap;
     bool terminate;
     bool logedIn;
-    std::unordered_map<std::string, std::string>* channelNumber;
+    SynchronizedHashMap *channelNumber;
 
 public:
-    StompProtocol(ThreadSafeHashMap_future & f, std::unordered_map<std::string, std::string>* channelNumber);
+    StompProtocol(ThreadSafeHashMap_future &f, SynchronizedHashMap *channelNumber);
     Frame process(std::string msg);
     void handelRecipt(const Frame &);
     bool shouldTerminate();
     void setTerminate();
     bool getLogedIn();
     bool setLogedIn(bool logedin);
-    std::string findKeyByValue(std::unordered_map<std::string, std::string>* myMap, std::string& valueToFind);
+    std::string findKeyByValue(SynchronizedHashMap *myMap, std::string &valueToFind);
 };

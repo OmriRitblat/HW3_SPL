@@ -15,10 +15,14 @@ public class Unsubscribe extends RequestFrame {
         int recipt=-1;
         boolean isIdFound=false;
         boolean isreciptExist=false;
-            if(!super.getHeaderByKey("id").equals("")) {
-                isIdFound = true;
-                channelId = Integer.parseInt(super.getHeaderByKey("id"));
-            }
+        if(!super.getHeaderByKey("id").equals("")) {
+            isIdFound = true;
+            channelId = Integer.parseInt(super.getHeaderByKey("id"));
+        }
+        if(!super.getHeaderByKey("receipt").equals("")) {
+            isreciptExist = true;
+            recipt=(Integer.parseInt(super.getHeaderByKey("receipt")));
+        }
         if(isreciptExist)
             this.setRecipet(recipt);
         if(!isIdFound){
@@ -41,7 +45,7 @@ public class Unsubscribe extends RequestFrame {
         else{
             c.removeSubscribtion(channelId,id);
             if(this.getReciept()!=-1)
-                f=new Reciept(id);
+                f=new Reciept(this.getReciept());
         }
         if(f!=null)
             c.send(id, f.toString());

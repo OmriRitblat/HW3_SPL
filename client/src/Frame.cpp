@@ -60,7 +60,7 @@ void Frame::parseStringToHashMap(const std::string &inputString)
             size_t pos = line.find(':');
             std::string key = line.substr(0, pos);
             std::string value = line.substr(pos + 1);
-            if (key=="receipt-id")
+            if (key=="receipt")
             {
                 receipt=std::stoi(value);
             }else{

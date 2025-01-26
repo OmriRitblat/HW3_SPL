@@ -2,6 +2,11 @@ CFLAGS := -c -Wall -Weffc++ -g -std=c++11 -Iinclude
 LDFLAGS := -lboost_system -lpthread
 BIN_DIR := bin
 
+# List of object files
+OBJS := $(BIN_DIR)/StompClient.o $(BIN_DIR)/ConnectionHandler.o $(BIN_DIR)/StompProtocol.o \
+        $(BIN_DIR)/ThreadSafeHashMap_future.o $(BIN_DIR)/keyboardInput.o $(BIN_DIR)/OutputHandler.o \
+        $(BIN_DIR)/Frame.o $(BIN_DIR)/SynchronizedHashMap.o $(BIN_DIR)/DataHandler.o $(BIN_DIR)/event.o
+
 # Default target
 all: clean_objects Client StompWCIClient
 
@@ -12,14 +17,14 @@ clean_objects:
 	rm -f $(BIN_DIR)/*.o $(BIN_DIR)/*.d
 
 # Client target
-Client: $(BIN_DIR)/StompClient.o $(BIN_DIR)/ConnectionHandler.o $(BIN_DIR)/StompProtocol.o $(BIN_DIR)/ThreadSafeHashMap_future.o $(BIN_DIR)/keyboardInput.o $(BIN_DIR)/OutputHandler.o $(BIN_DIR)/Frame.o $(BIN_DIR)/ThreadSafeQueue.o $(BIN_DIR)/DataHandler.o $(BIN_DIR)/event.o
+Client: $(OBJS)
 	mkdir -p $(BIN_DIR)
-	g++ -o $(BIN_DIR)/Client $^ $(LDFLAGS)
+	g++ -o $(BIN_DIR)/Client $(OBJS) $(LDFLAGS)
 
 # StompWCIClient target
-StompWCIClient: $(BIN_DIR)/ConnectionHandler.o $(BIN_DIR)/StompClient.o $(BIN_DIR)/event.o $(BIN_DIR)/ThreadSafeQueue.o $(BIN_DIR)/Frame.o $(BIN_DIR)/StompProtocol.o $(BIN_DIR)/ThreadSafeHashMap_future.o $(BIN_DIR)/keyboardInput.o $(BIN_DIR)/OutputHandler.o $(BIN_DIR)/DataHandler.o
+StompWCIClient: $(OBJS)
 	mkdir -p $(BIN_DIR)
-	g++ -o $(BIN_DIR)/StompWCIClient $^ $(LDFLAGS)
+	g++ -o $(BIN_DIR)/StompWCIClient $(OBJS) $(LDFLAGS)
 
 # Generic rule to compile .cpp files into .o files
 $(BIN_DIR)/%.o: src/%.cpp
