@@ -48,7 +48,5 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
 
     public void setShouldTerminate(boolean shouldTerminate) {
         this.shouldTerminate = shouldTerminate;
-        if(shouldTerminate)
-            connections.disconnect(connectionId);
     }
 }

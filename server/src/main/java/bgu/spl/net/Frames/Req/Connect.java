@@ -41,7 +41,7 @@ public class Connect extends RequestFrame {
         if (this.isMissingData()){
             f = new Error("part of the data is missing, please send {version, host, user, password} in order to CONNECT",
                     this.getMessage(), "the frame missing data", this.getReciept());}
-        else if (c.isLoggedIn(id) || !c.isCorrectPassword(id, password))
+        else if (c.isLoggedIn(id,user) || !c.isCorrectPassword(id, password))
             f = new Error("User already logged in or password is not match", this.getMessage(),
                     "User already logged in or password is not match", this.getReciept());
         else if (!version.equals("1.2"))

@@ -38,8 +38,8 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
                     protocol.process(nextMessage);
                 }
             }
-            if((read = in.read()) < 0)
-                protocol.setShouldTerminate(true);
+            // if(!protocol.shouldTerminate() &&(read = in.read()) < 0)
+            //     protocol.setShouldTerminate(true);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -49,6 +49,10 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     public void close() throws IOException {
         connected = false;
         sock.close();
+    }
+
+    public void terminateProtocol(){
+        protocol.setShouldTerminate(true);
     }
 
     @Override

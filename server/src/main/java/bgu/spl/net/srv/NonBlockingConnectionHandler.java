@@ -78,6 +78,10 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         }
     }
 
+    public void terminateProtocol(){
+        protocol.setShouldTerminate(true);
+    }
+
     public boolean isClosed() {
         return !chan.isOpen();
     }
