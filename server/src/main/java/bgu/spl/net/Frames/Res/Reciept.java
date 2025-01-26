@@ -10,7 +10,7 @@ public class Reciept extends ResponseFrame {
         this.recieptId = recieptId;
     }
     public Reciept(int recieptId) {
-        super("RECEIPT", ResponseFrame.getData("RECEIPT/n receipt-id :" + recieptId+"\n\n"),ResponseFrame.getBody("CONNECTED/n version:" + recieptId+"\n\n"));
+        super("RECEIPT", ResponseFrame.getData("RECEIPT\n receipt-id :" + recieptId+"\n\n"),ResponseFrame.getBody("CONNECTED\n version:" + recieptId+"\n\n"));
         this.recieptId = recieptId;
     }
 }
