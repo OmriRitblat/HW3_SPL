@@ -31,6 +31,7 @@ public interface Server<T> extends Closeable {
             @Override
             protected void execute(BlockingConnectionHandler<T>  handler) {
                 new Thread(handler).start();
+                
             }
         };
 

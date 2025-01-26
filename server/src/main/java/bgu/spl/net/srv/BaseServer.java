@@ -47,6 +47,7 @@ public abstract class BaseServer<T> implements Server<T> {
                         encdecFactory.get(),
                         protocolFactory.get(),idCounter,con);
                 con.addConnect(idCounter,handler);
+                idCounter++;
                 execute(handler);            }
         } catch (IOException ex) {
         }
