@@ -55,7 +55,7 @@ void StompProtocol::handelRecipt(const Frame &serverMessage)
     {
         size_t pos = f.getValue("id").find_last_of('/');
         std::string result = (pos != std::string::npos) ? f.getValue("id").substr(pos + 1) : f.getValue("id");
-        c.display("Exited channel " + findKeyByValue((*channelNumber),result));
+        c.display("Exited channel " + findKeyByValue(channelNumber,result));
         break;
     }
     case CommandType::DISCONNECT:
@@ -73,9 +73,9 @@ bool StompProtocol::getLogedIn()
 {
     return logedIn;
 }
-std::string StompProtocol::findKeyByValue(const std::unordered_map<std::string, std::string>& myMap, const std::string& valueToFind) {
+std::string StompProtocol::findKeyByValue(std::unordered_map<std::string, std::string>* myMap, std::string& valueToFind) {
     // Iterate through the unordered_map
-    for (const auto& pair : myMap) {
+    for (auto& pair : (*myMap)) {
         if (pair.second == valueToFind) { // Check if the value matches
             return pair.first; // Return the key
         }
