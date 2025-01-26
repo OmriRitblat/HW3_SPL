@@ -34,15 +34,6 @@ public abstract class Frame implements Serializable {
             return "";
         return headers.get(key);
     }
-    // public String toString(){
-    //     String output = type + "\n";
-    //     for (String key : headers.keySet()){
-    //         output += key + ":" + headers.get(key) + "\n";
-    //     }
-    //     output += "\n" + body;
-    //     return output;
-    // }
-
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
@@ -101,5 +92,13 @@ public abstract class Frame implements Serializable {
         return (delimiterPos != -1 && delimiterPos + 2 < msg.length())
                 ? msg.substring(delimiterPos + 2)
                 : "";
+    }
+    public boolean headersCheck(int numOfHeaders){//without receipt
+        int counter=0;
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            if(entry.getKey()!="receipt")
+                counter++;
+        }
+        return counter==numOfHeaders;
     }
 }

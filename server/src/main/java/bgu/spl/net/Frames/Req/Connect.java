@@ -47,6 +47,9 @@ public class Connect extends RequestFrame {
         else if (!version.equals("1.2"))
             f = new Error("the version does not match the latest version, should be 1.2", this.getMessage(),
                     "version does not match", this.getReciept());
+        else if(headersCheck(1))
+        f = new Error("there are to much headers", this.getMessage(),
+        "headers check failed", this.getReciept());
         else {
             c.login(id);
             f = new Connected(version);

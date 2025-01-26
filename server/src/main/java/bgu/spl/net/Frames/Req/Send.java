@@ -34,6 +34,9 @@ public class Send extends RequestFrame {
             f=new Error("user not subscribe to the channel or the cannel does not exist", getMessage(), "user not subscribe to the channel or the cannel does not exist", getReciept());
             c.send(id,f.toString());
         }
+        else if(headersCheck(1))
+        f = new Error("there are to much headers", this.getMessage(),
+        "headers check failed", this.getReciept());
         else{
             List<Integer> subToChan=c.getSubsribtion(destination);
             for(Integer i:subToChan){

@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
         {
             if (client->connectionHandler != nullptr && client->connectionHandler->getLogedIn())
             {
-                client->c.display("user allready loged in");
+                client->c.display("Client allready loged in");
                 break;
             }
             size_t pos = frame.getValue("host").find(':');
@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
             std::string user = frame.getValue("user");
             std::string channel = frame.getValue("channel_name");
             std::string file = frame.getValue("file");
-            client->c.printToFile(data.getSummary(user, channel), file);
+            if((*client->channelNumber)[channel]!="")
+                client->c.printToFile(data.getSummary(user, channel), file);
         }
         else
         {

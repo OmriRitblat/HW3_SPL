@@ -21,6 +21,9 @@ public class Disconnect extends RequestFrame {
         else if(!c.isLoggedIn(id)){
             f=new Error("user not loged in so can not be disconnected", this.getMessage(), "user not loged in so can not be disconnected", id);
         }
+        else if(headersCheck(0))
+        f = new Error("there are to much headers", this.getMessage(),
+        "headers check failed", this.getReciept());
         else{
             f=new Reciept(getReciept());
         }

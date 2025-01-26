@@ -41,6 +41,9 @@ public class Subscribe extends RequestFrame {
             f=new bgu.spl.net.Frames.Res.Error("user not loged in so can not subscribe to channels", this.getMessage(), "user not loged in so can not subscribe to channels", id);
         else if(c.isSubscribe(id, channelName))
             f=new bgu.spl.net.Frames.Res.Error("user already subscribe to this channel", this.getMessage(), "user already subscribe to this channel", id);
+            else if(headersCheck(2))
+        f = new Error("there are to much headers", this.getMessage(),
+        "headers check failed", this.getReciept());
         else{
             c.addSubscribtion(channelName,id,channelId);
             if(this.getReciept()!=-1)
