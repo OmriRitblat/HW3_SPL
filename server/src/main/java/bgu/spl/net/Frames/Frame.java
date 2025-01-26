@@ -52,7 +52,7 @@ public abstract class Frame implements Serializable {
         }
 
         // Append body
-        output.append("\n \n")
+        output.append("\n")
             .append(body == null ? "null" : body);
 
         return output.toString();

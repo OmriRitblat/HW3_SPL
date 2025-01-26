@@ -26,6 +26,7 @@
 /Users/adicohen/Documents/spl/HW3_SPL/server/src/main/java/bgu/spl/net/impl/rci/ObjectEncoderDecoder.java
 /Users/adicohen/Documents/spl/HW3_SPL/server/src/main/java/bgu/spl/net/impl/rci/RCIClient.java
 /Users/adicohen/Documents/spl/HW3_SPL/server/src/main/java/bgu/spl/net/impl/rci/RemoteCommandInvocationProtocol.java
+/Users/adicohen/Documents/spl/HW3_SPL/server/src/main/java/bgu/spl/net/impl/stomp/StompEncoderDecoder.java
 /Users/adicohen/Documents/spl/HW3_SPL/server/src/main/java/bgu/spl/net/impl/stomp/StompServer.java
 /Users/adicohen/Documents/spl/HW3_SPL/server/src/main/java/bgu/spl/net/srv/ActorThreadPool.java
 /Users/adicohen/Documents/spl/HW3_SPL/server/src/main/java/bgu/spl/net/srv/BaseServer.java

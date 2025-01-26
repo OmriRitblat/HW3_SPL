@@ -26,6 +26,7 @@ public class ConnectionImp<T> implements Connections<T>{
     public boolean send(int connectionId, T msg){
         ConnectionHandler c=clients.get(connectionId);
         if(c!=null) {
+            System.out.println((String)msg);
             c.send(msg);
             return true;
         }
@@ -59,6 +60,7 @@ public class ConnectionImp<T> implements Connections<T>{
                 throw new RuntimeException(e);
             }
         }
+        clients.remove(connectionId);
     }
 
     public int getMessageCount() {
