@@ -17,6 +17,7 @@ Frame StompProtocol::process(std::string msg)
         c.display("Error :\n");
         c.display(serverMessage.getValue("message"));
         terminate = true;
+        logedIn = false;
         break;
     case CommandType::MESSAGE:
         return serverMessage; // for updating the hashmap of events
