@@ -48,14 +48,14 @@ int main(int argc, char *argv[])
         {
             if (frame.getType() == CommandType::SUBSCRIBE)
             {
-                (*client->channelNumber)[frame.getValue("destination")] = client->channelSubCount+"";
+                (*client->channelNumber)[frame.getValue("destination")] = std::to_string(client->channelSubCount);
                 frame.setValueAt("id", std::to_string(client->channelSubCount));
                 client->channelSubCount++;
             }
             if (frame.getType() == CommandType::UNSUBSCRIBE)
             {
-                auto it = (*client->channelNumber).find(frame.getValue("destination"));
-                frame.setValueAt("id", (*client->channelNumber)[frame.getValue("destination")]);
+                auto it = (*client->channelNumber).find(frame.getValue("id"));
+                frame.setValueAt("id", ""+(*client->channelNumber)[frame.getValue("id")]);
                 if (it != (*client->channelNumber).end())
                 {
                     (*client->channelNumber).erase(it);
@@ -95,10 +95,12 @@ void StompClient::getDataFromServer()
         // std::cout << answer << std::endl;
         // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
         // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
+        if(answer.length()>0){
         Frame answerFrame(answer);
         Frame res = (*connectionHandler).process(answer);
         if (answerFrame.getType() == CommandType::MESSAGE)
             server_data[res.getValue("destination")].push_back(res);
+        }
         answer = "";
     } while (connectionHandler->hasDataToRead());
 }
