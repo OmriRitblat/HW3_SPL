@@ -96,7 +96,7 @@ public abstract class Frame implements Serializable {
     public boolean headersCheck(int numOfHeaders){//without receipt
         int counter=0;
         for (Map.Entry<String, String> entry : headers.entrySet()) {
-            if(entry.getKey()!="receipt")
+            if(!entry.getKey().equals("receipt"))
                 counter++;
         }
         return counter==numOfHeaders;

@@ -87,11 +87,13 @@ int main(int argc, char *argv[])
 }
 void StompClient::getDataFromServer()
 {
+
     std::string answer;
     // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
     // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
     do
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         (*connectionHandler).getLine(answer);
         // std::cout << answer << std::endl;
         // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket

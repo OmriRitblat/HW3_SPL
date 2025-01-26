@@ -10,18 +10,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ConnectionImp<T> implements Connections<T>{
     private ConcurrentHashMap<Integer, ConnectionHandler> clients; //<connction id, connection handler>
     private ConcurrentHashMap<String, List<Integer>> subsribtion; //<channel name, list<connection id>>
-    private ConcurrentHashMap<Integer, ConcurrentHashMap<Integer,String>> channelsId; // <connection id, <channel id, channel name>>
-    private ConcurrentHashMap<Integer, Boolean> login; //<connection id, is logged in>
-    private ConcurrentHashMap<Integer,String> idData;//<connection id, password>
+    private ConcurrentHashMap<String, UserInfo> users; //<user name, user info>
+    private ConcurrentHashMap<Integer, String> clientToUser; //<connection id, user name>
     private AtomicInteger messageCount;
 
     public ConnectionImp(){
         this.clients=new ConcurrentHashMap<>();
-        this.login=new ConcurrentHashMap<>();
         this.subsribtion=new ConcurrentHashMap<>();
-        this.idData=new ConcurrentHashMap<>();
-        this.channelsId=new ConcurrentHashMap<>();
+        this.users=new ConcurrentHashMap<>();
         this.messageCount=new AtomicInteger(0);
+        this.clientToUser=new ConcurrentHashMap<>();
     }
     public boolean send(int connectionId, T msg){
         ConnectionHandler c=clients.get(connectionId);
@@ -51,7 +49,7 @@ public class ConnectionImp<T> implements Connections<T>{
                 notifyAll();
             }
         });
-        login.computeIfPresent(connectionId, (key, value) -> false);
+        users.get(clientToUser.get(connectionId)).setLoggedIn(false);
         if(clients.get(connectionId)!=null){
             try {
                 clients.get(connectionId).close();
@@ -72,9 +70,7 @@ public class ConnectionImp<T> implements Connections<T>{
     }
 
     public Integer getChannelId(String channel,int connectionId){
-        if(channelsId.containsKey(connectionId))
-            return findKeyByValue(channelsId.get(connectionId), channel);
-        return null;
+        return users.get(clientToUser.get(connectionId)).getChannelId(channel);
     }
 
     public void addConnect(int connectionId,ConnectionHandler ch){
@@ -84,83 +80,67 @@ public class ConnectionImp<T> implements Connections<T>{
     public void addSubscribtion(String channel,int connectionId, int channelId){
         if (!subsribtion.containsKey(channel)){
             subsribtion.put(channel, new ArrayList<>());
-            if (!channelsId.containsKey(connectionId)){
-                channelsId.put(connectionId,new ConcurrentHashMap<>());
-            }
         }
         subsribtion.get(channel).add(connectionId);
-        channelsId.get(connectionId).put(channelId,channel);
+        if(users.get(clientToUser.get(connectionId)).getChannelName(channelId)==null)
+            users.get(clientToUser.get(connectionId)).addSubscribtion(channelId,channel);
     }
 
     public boolean removeSubscribtion(int channelId,int subId){
         boolean isRemoved=false;
-        if(channelsId.containsKey(subId)){
-            if(channelsId.get(subId).containsKey(channelId)) {
-                String channelName = channelsId.get(subId).get(channelId);
-                channelsId.get(subId).remove(channelId);
-                if(subsribtion.containsKey(channelName)){
-                    List<Integer> sub=subsribtion.get(channelName);
-                    if (sub.contains(subId)) {
-                        sub.remove(subId);
-                        isRemoved = true;
+        if(clientToUser.get(subId)!=null && users.get(clientToUser.get(subId))!=null) {
+            if (users.get(clientToUser.get(subId)).getChannelName(channelId) != null) {
+                String channelName = users.get(clientToUser.get(subId)).getChannelName(channelId);
+                if (subsribtion.containsKey(channelName)) {
+                    List<Integer> sub = subsribtion.get(channelName);
+                    if (sub != null && sub.contains(subId)) {
+                        subsribtion.get(channelName).remove(subId);
+                        if (users.get(clientToUser.get(subId)).removeSubscribtion(channelId))
+                            isRemoved = true;
                     }
                 }
             }
         }
-
             return  isRemoved;
     }
     public boolean isLoggedIn(int connectionId){
-        return login.get(connectionId)!=null && login.get(connectionId);
+        boolean result=false;
+        if(clientToUser.get(connectionId)!=null)
+            if(users.get(clientToUser.get(connectionId))!=null)
+                result=users.get(clientToUser.get(connectionId)).isLoggedIn();
+        return result;
     }
 
     public boolean isCorrectPassword(int id, String password){
-        if(login.get(id)==null){
-            idData.put(id,password);
-            return true;
-        }else
-            return idData.get(id).equals(password);
+        if(clientToUser.get(id)!=null && users.get(clientToUser.get(id))!=null) {
+            if (users.get(clientToUser.get(id)).isLoggedIn()) {
+                users.get(clientToUser.get(id)).setPasscode(password);
+                return true;
+            } else
+                return users.get(clientToUser.get(id)).getPasscode().equals(password);
+        }
+        return true;
     }
 
-    public void login(int connectionId){
-        login.put(connectionId,true);
+    public void login(int connectionId, String userName){
+        users.put(userName,new UserInfo());
+        clientToUser.put(connectionId,userName);
     }
 
     public boolean isSubscribe(int id, int channelId){
-        if(channelsId.containsKey(id)) {
-            if (channelsId.get(id).containsKey(channelId)) {
-                String channelName = channelsId.get(id).get(channelId);
-                if (subsribtion.get(channelName) != null)
-                    for (Integer subId : subsribtion.get(channelName)) {
-                        if (subId == id)
-                            return true;
-                    }
-            }
+        if(clientToUser.get(id)!=null && users.get(clientToUser.get(id))!=null) {
+            return users.get(clientToUser.get(id)).isSubscribe(channelId);
         }
         return false;
     }
 
     public boolean isSubscribe(int id, String channelName){
-        if(channelsId.containsKey(id)) {
-            Integer channelId= findKeyByValue(channelsId.get(id), channelName);
-            if (channelId!=null) {
-                return true;
-            }
+        if(clientToUser.get(id)!=null && users.get(clientToUser.get(id))!=null) {
+            return users.get(clientToUser.get(id)).isSubscribe(channelName);
         }
         return false;
     }
 
-    private Integer findKeyByValue(ConcurrentHashMap<Integer, String> map, String valueReq) {
-        AtomicInteger keyForValueReq = new AtomicInteger(-1);
-        map.forEach((key, value) -> {
-            if (value.equals(valueReq)) {
-                keyForValueReq.updateAndGet(v -> key);
-            }
-        });
-        if(keyForValueReq.get()!=-1){
-            return keyForValueReq.get();
-        }
-        return null;
-    }
+
     
 }

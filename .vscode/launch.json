@@ -14,7 +14,7 @@
             "preLaunchTask": "mvn compile"
         },
         {
-            "name": "(gdb) Launch stomp client",
+            "name": "stompClient",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/client/bin/StompWCIClient",

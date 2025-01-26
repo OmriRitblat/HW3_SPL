@@ -35,10 +35,10 @@ public class Unsubscribe extends RequestFrame {
             f=new bgu.spl.net.Frames.Res.Error("user not loged in so can not unsubscribe to channels", this.getMessage(), "user not loged in so can not unsubscribe to channels", id);
         else if(!c.isSubscribe(id, channelId))
             f=new bgu.spl.net.Frames.Res.Error("user is not subscribe to this channel or channel does not exist so can not unsubscribe", this.getMessage(), "user is not subscribe to this channel so can not unsubscribe", id);
-            else if(headersCheck(1))
+        else if(!headersCheck(1))
             f = new Error("there are to much headers", this.getMessage(),
             "headers check failed", this.getReciept());
-            else{
+        else{
             c.removeSubscribtion(channelId,id);
             if(this.getReciept()!=-1)
                 f=new Reciept(id);
