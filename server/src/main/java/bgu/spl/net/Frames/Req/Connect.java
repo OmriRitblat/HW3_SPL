@@ -49,7 +49,7 @@ public class Connect extends RequestFrame {
                     "version does not match", this.getReciept());
         else {
             c.login(id);
-            f = new Connected(version);
+            f=new Connected(version);
             if (this.getReciept() != -1) {
                 c.send(id, f.toString());
                 f = new Reciept(getReciept());

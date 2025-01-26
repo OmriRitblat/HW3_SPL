@@ -7,10 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Message extends ResponseFrame {
 
     public Message(String msg, String destination, Integer subscription, int msgId){
-        super("MESSAGE", Frame.getData("MESSAGE\n subscription:"+subscription+"\n message-id:"+msgId+"\n destination:"+destination),msg);
-    }
-    public Message(String msg, ConcurrentHashMap<String, String> headers){
-        super("MESSAGE", headers,msg);
+        super("MESSAGE", Frame.getData("MESSAGE\n subscription:"+subscription+"\n message-id:"+msgId+"\n destination:"+destination+"\n\n"),msg);
     }
 
 
