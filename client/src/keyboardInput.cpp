@@ -5,7 +5,6 @@
 #include "../include/event.h"
 #include "../include/keyboardInput.h"
 #include "../include/OutputHandler.h"
-#include "../include/SynchronizedHashMap.h"
 #include <unordered_map>
 #include "../include/Frame.h"
 
@@ -64,7 +63,7 @@ void keyboardInput::run()
         {
             if (frames.front().getType() == CommandType::SUBSCRIBE)
             {
-                (*channelNumber).get(frames.front().getValue("destination")) = std::to_string(channelSubCount);
+                (*channelNumber).put(frames.front().getValue("destination"),std::to_string(channelSubCount));
                 frames.front().setValueAt("id", std::to_string(channelSubCount));
                 channelSubCount++;
             }
@@ -79,7 +78,6 @@ void keyboardInput::run()
                 receipt++;
                 frame.addReceipt("receipt", receipt);
                 (*sendMessages).put(receipt, frame);
-                std::cout << frame.toString() << std::endl;
                 if (!(*connectionHandler).sendLine(frame.toString()))
                 {
                     std::cout << "Disconnected. Exiting...\n"

@@ -6,6 +6,7 @@
 #include "../include/ConnectionHandler.h"
 #include "../include/DataHandler.h"
 #include "../include/OutputHandler.h"
+#include "../include/SynchronizedHashMap.h"
 #include <thread>
 #include <iostream>
 #include <list>

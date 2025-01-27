@@ -8,4 +8,4 @@ bin/keyboardInput.o: src/keyboardInput.cpp src/../include/event.h \
  src/../include/../include/SynchronizedHashMap.h \
  src/../include/../include/DataHandler.h \
  src/../include/../include/OutputHandler.h \
- src/../include/SynchronizedHashMap.h
+ src/../include/../include/SynchronizedHashMap.h
